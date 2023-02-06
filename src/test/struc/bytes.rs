@@ -17,7 +17,7 @@ pub struct A1 {
 fn self_test() {
     let example = get_example();
     let example_str = crate::ser::to_vec(&example).unwrap();
-    println!("{example_str:?}");
+    println!("{example_str:X?}");
 
     let example_des: ExType = crate::des::from_slice(&example_str).unwrap();
     assert_eq!(example, example_des);
