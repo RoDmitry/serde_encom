@@ -1,9 +1,9 @@
 use crate::des::deserializer::{Deserializer, ScratchState};
-use crate::des::read::{Read, StrOrBytes};
+use crate::des::read::Read;
 use crate::error::{Error, ErrorCode, Result};
 #[cfg(feature = "float_roundtrip")]
 use crate::lexical;
-use crate::to_inner_des_method;
+use crate::parser_number::ParserNumber;
 use atoi_simd::parse;
 use serde::de;
 
@@ -24,33 +24,19 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for ScratchDeserializer<'a, '_
             return Err(self.des.peek_error(ErrorCode::EofWhileParsingList)); // todo: change err?
         }
 
+        let integer = parse(self.des.scratch.get_slice())?;
         let ret = match self.state {
-            ScratchState::Str | ScratchState::Bytes => {
-                let len = parse(self.des.scratch.get_slice())?;
-                let value = {
-                    self.des.eat_char();
-                    let res = match self.des.read.str_or_bytes(len)? {
-                        StrOrBytes::Str(v) => visitor.visit_borrowed_str(v),
-                        StrOrBytes::Bytes(v) => visitor.visit_borrowed_bytes(v),
-                    };
-
-                    // checks for ' ' or '}' after slice
-                    match self.des.peek()? {
-                        Some(b' ') | Some(b'}') | Some(b'\n') | Some(b'\t') | Some(b'\r')
-                        | None => res,
-                        _ => Err(self.des.peek_error(ErrorCode::UnexpectedEndOfString)),
-                    }
-                };
-                self.des.scratch.clear();
-                value
+            ScratchState::Str => self.des.deserialize_str_by_index(visitor, integer as usize),
+            ScratchState::Bytes => self
+                .des
+                .deserialize_bytes_by_index(visitor, integer as usize),
+            ScratchState::Number => visitor.visit_u64(integer),
+            ScratchState::FloatNumber => {
+                ParserNumber::F64(self.des.parse_decimal(true, integer, 0)?).visit(visitor)
             }
-            ScratchState::Number => {
-                let value = visitor.visit_u64(parse(self.des.scratch.get_slice())?);
-                self.des.scratch.clear();
-                value
-            }
-            _ => todo!(), // todo: different types (ex i64)
+            ScratchState::None => Err(self.des.peek_error(ErrorCode::ExpectedSomeIdent)), // todo: new error?
         };
+        self.des.scratch.clear();
         *self.state = ScratchState::None;
         ret
     }

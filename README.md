@@ -5,7 +5,7 @@
 
 ### Made to replace old and loved JSON
 
-More information [here](https://github.com/RoDmitry/EnCom).
+[EnCom specification](https://github.com/RoDmitry/EnCom)
 
 As long as you use standard serialization, and don't use serde_bytes, then the serialization output will be a valid string (utf8, not binary).
 
@@ -14,10 +14,12 @@ If you use string or byte slice in your resulting structure, it will not be clon
 You can try `encom_from_json!()` macro to convert your own JSON and test it. Resulting EnCom will be sorted alphabetically.
 
 ## Todo:
-- [ ] Fix Value deserializer
+- [ ] Test Value deserializer
 - [ ] Pretty fix spacing
-- [ ] Skip Option::None by default, and only if `#[serde(serialize_with = "path")] ` is passed, then serialize None
+- [ ] Skip Option::None by default, and only if `#[serde(serialize_with = "path")]` is passed, then serialize None
 - [ ] Fix Stream deserializer
 - [ ] Fix File deserializer
+- [ ] Fix extra space after `}` in serializer
+- [ ] Fix parse exponent in deserializer
 
 ### Thanks [serde_json](https://github.com/serde-rs/json) and it's [contributors](https://github.com/serde-rs/json/graphs/contributors) for the base code that was used it this project

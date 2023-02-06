@@ -1,6 +1,6 @@
 [package]
 name = "serde_encom"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Dmitry Rodionov <18184039+RoDmitry@users.noreply.github.com>"]
 description = "Official EnCom Rust library"
 repository = "https://github.com/RoDmitry/serde_encom"

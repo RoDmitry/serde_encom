@@ -6,7 +6,6 @@ use crate::des::read::Read;
 use crate::error::{Error, ErrorCode, Result};
 #[cfg(feature = "float_roundtrip")]
 use crate::lexical;
-use crate::to_inner_des_method;
 use serde::de;
 
 pub struct InitDeserializer<'a, R> {

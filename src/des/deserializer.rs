@@ -1,5 +1,5 @@
 use super::access::{MapAccess, ScratchMapAccess, ScratchSeqAccess, SeqAccess, VariantAccess};
-use super::read::{IoRead, Read, Reference, SliceRead, StrOrBytes, StrRead};
+use super::read::{IoRead, Read, Reference, SliceRead, StrRead};
 use super::stack::Stack;
 use super::{parser_number::ParserNumber, stream_deserializer::StreamDeserializer};
 use crate::error::{Error, ErrorCode, Result};
@@ -179,6 +179,7 @@ pub(crate) enum ScratchState {
     Bytes,
     Number,
     FloatNumber,
+    // ExponentNumber,
     None,
 }
 
@@ -368,6 +369,9 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                 Some(b'=') => return Ok(PreParser::ScratchSeq(ScratchState::Str)),
                 Some(b'~') => return Ok(PreParser::ScratchSeq(ScratchState::Bytes)),
                 Some(b'.') => return Ok(PreParser::ScratchSeq(ScratchState::FloatNumber)),
+                /* Some(b'e') | Some(b'E') => { // todo????
+                    return Ok(PreParser::ScratchSeq(ScratchState::ExponentNumber))
+                } */
                 Some(b'}') | Some(b' ') | Some(b'\n') | Some(b'\t') | Some(b'\r') | None => {
                     return Ok(PreParser::ScratchSeq(ScratchState::Number))
                 }
@@ -376,36 +380,52 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         }
     }
 
+    /// checks end of string or bytes
+    #[inline]
+    pub(crate) fn end_of_str_or_bytes(&mut self) -> Result<()> {
+        match self.peek()? {
+            Some(b'}') | Some(b' ') | Some(b'\n') | Some(b'\t') | Some(b'\r') | None => Ok(()),
+            _ => Err(self.peek_error(ErrorCode::UnexpectedEndOfString)),
+        }
+    }
+
+    pub(crate) fn deserialize_str_by_index<V>(&mut self, visitor: V, i: usize) -> Result<V::Value>
+    where
+        V: de::Visitor<'de>,
+    {
+        self.eat_char();
+        let res = visitor.visit_borrowed_str(self.read.read_str(i)?);
+        self.end_of_str_or_bytes()?;
+        res
+    }
+
+    pub(crate) fn deserialize_bytes_by_index<V>(&mut self, visitor: V, i: usize) -> Result<V::Value>
+    where
+        V: de::Visitor<'de>,
+    {
+        self.eat_char();
+        let res = visitor.visit_borrowed_bytes(self.read.read_slice(i)?);
+        self.end_of_str_or_bytes()?;
+        res
+    }
+
     /// what value is in main deserializer `deserialize_any()`
-    /// no validation of chars, because atoi_simd will do it
     pub(crate) fn any_map_value<V>(&mut self, visitor: V) -> Result<V::Value>
     where
         V: de::Visitor<'de>,
     {
         let integer = self.read.read_int_until_invalid()?;
         match self.peek()? {
-            Some(b'=') | Some(b'~') => {
-                self.eat_char();
-                // todo: remove str_or_bytes, make separate fn
-                let res = match self.read.str_or_bytes(integer)? {
-                    StrOrBytes::Str(v) => visitor.visit_borrowed_str(v),
-                    StrOrBytes::Bytes(v) => visitor.visit_borrowed_bytes(v),
-                };
-
-                // checks for ' ' or '}' after slice
-                match self.peek()? {
-                    Some(b' ') | Some(b'}') | Some(b'\n') | Some(b'\t') | Some(b'\r') | None => res,
-                    _ => Err(self.peek_error(ErrorCode::UnexpectedEndOfString)),
-                }
-            }
+            Some(b'=') => self.deserialize_str_by_index(visitor, integer as usize),
+            Some(b'~') => self.deserialize_bytes_by_index(visitor, integer as usize),
             Some(b'.') => ParserNumber::F64(self.parse_decimal(true, integer, 0)?).visit(visitor),
-            Some(b'e') | Some(b'E') => {
+            /* Some(b'e') | Some(b'E') => {
                 ParserNumber::F64(self.parse_exponent(true, integer, 0)?).visit(visitor)
-            }
+            } */
             Some(b'}') | Some(b' ') | Some(b'\n') | Some(b'\t') | Some(b'\r') | None => {
                 ParserNumber::U64(integer).visit(visitor)
             }
-            Some(_) => Err(self.error(ErrorCode::ExpectedSomeIdent)),
+            Some(_) => Err(self.error(ErrorCode::ExpectedSomeIdent)), // todo: new error?
         }
     }
 
@@ -611,7 +631,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         })
     }
 
-    fn parse_decimal(
+    pub(crate) fn parse_decimal(
         &mut self,
         positive: bool,
         mut significand: u64,
@@ -1632,14 +1652,7 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for &'a mut Deserializer<R> {
 
         // takes str len before :
         let value = if let ParserNumber::U64(len) = self.parse_integer(true)? {
-            self.eat_char();
-            let res = visitor.visit_borrowed_str(self.read.read_str(len)?);
-
-            // checks for ' ' or '}' after string
-            match self.peek()? {
-                Some(b' ') | Some(b'}') | Some(b'\n') | Some(b'\t') | Some(b'\r') | None => res,
-                _ => Err(self.peek_error(ErrorCode::UnexpectedEndOfString)),
-            }
+            self.deserialize_str_by_index(visitor, len as usize)
         } else {
             Err(self.peek_invalid_type(&visitor))
         };
@@ -1747,14 +1760,7 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for &'a mut Deserializer<R> {
         }; */
 
         let value = if let ParserNumber::U64(len) = self.parse_integer(true)? {
-            self.eat_char();
-            let res = visitor.visit_borrowed_bytes(self.read.read_slice(len)?);
-
-            // checks for ' ' or '}' after slice
-            match self.peek()? {
-                Some(b' ') | Some(b'}') | Some(b'\n') | Some(b'\t') | Some(b'\r') | None => res,
-                _ => Err(self.peek_error(ErrorCode::UnexpectedEndOfString)),
-            }
+            self.deserialize_bytes_by_index(visitor, len as usize)
         } else {
             Err(self.peek_invalid_type(&visitor))
         };

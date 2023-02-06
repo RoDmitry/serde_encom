@@ -62,15 +62,13 @@ pub trait Read<'de>: private::Sealed {
     #[doc(hidden)]
     fn byte_offset(&self) -> usize;
 
-    fn read_str<'s>(&'s mut self, len: u64) -> Result<&'de str>;
+    fn read_str<'s>(&'s mut self, len: usize) -> Result<&'de str>;
 
-    fn read_slice<'s>(&'s mut self, len: u64) -> Result<&'de [u8]>;
+    fn read_slice<'s>(&'s mut self, len: usize) -> Result<&'de [u8]>;
 
     fn read_int_until_invalid(&mut self) -> Result<u64>;
 
     fn str_from_scratch<'s>(&'s mut self, scratch: &'s mut Stack<u8, 32>) -> Result<&str>;
-
-    fn str_or_bytes<'s>(&'s mut self, len: u64) -> Result<StrOrBytes<'de>>;
 
     /// Assumes the previous byte was a quotation mark. Parses a EnCom-escaped
     /// string until the next quotation mark using the given scratch space if
@@ -156,11 +154,6 @@ where
             Reference::Copied(c) => c,
         }
     }
-}
-
-pub enum StrOrBytes<'a> {
-    Str(&'a str),
-    Bytes(&'a [u8]),
 }
 
 /// EnCom input source that reads from a std::io input stream.
@@ -348,15 +341,11 @@ where
         }
     }
 
-    fn read_str<'s>(&'s mut self, len: u64) -> Result<&'de str> {
+    fn read_str<'s>(&'s mut self, len: usize) -> Result<&'de str> {
         unimplemented!()
     }
 
-    fn read_slice<'s>(&'s mut self, len: u64) -> Result<&'de [u8]> {
-        unimplemented!()
-    }
-
-    fn str_or_bytes<'s>(&'s mut self, len: u64) -> Result<StrOrBytes<'de>> {
+    fn read_slice<'s>(&'s mut self, len: usize) -> Result<&'de [u8]> {
         unimplemented!()
     }
 
@@ -582,16 +571,16 @@ impl<'a> Read<'a> for SliceRead<'a> {
     }
 
     #[inline]
-    fn read_str<'s>(&'s mut self, len: u64) -> Result<&'a str> {
+    fn read_str<'s>(&'s mut self, len: usize) -> Result<&'a str> {
         let start = self.index;
-        self.index += len as usize;
+        self.index += len;
         as_str(self, &self.slice[start..self.index])
     }
 
     #[inline]
-    fn read_slice<'s>(&'s mut self, len: u64) -> Result<&'a [u8]> {
+    fn read_slice<'s>(&'s mut self, len: usize) -> Result<&'a [u8]> {
         let start = self.index;
-        self.index += len as usize;
+        self.index += len;
         Ok(&self.slice[start..self.index])
     }
 
@@ -604,10 +593,6 @@ impl<'a> Read<'a> for SliceRead<'a> {
     #[inline]
     fn str_from_scratch<'s>(&'s mut self, scratch: &'s mut Stack<u8, 32>) -> Result<&str> {
         as_str(self, scratch.get_slice())
-    }
-
-    fn str_or_bytes<'s>(&'s mut self, len: u64) -> Result<StrOrBytes<'a>> {
-        Ok(StrOrBytes::Bytes(self.read_slice(len)?))
     }
 
     #[inline]
@@ -627,27 +612,27 @@ impl<'a> Read<'a> for SliceRead<'a> {
     }
 
     fn ignore_str(&mut self) -> Result<()> {
-        loop {
-            while self.index < self.slice.len() && !ESCAPE[self.slice[self.index] as usize] {
+        // loop {
+        while self.index < self.slice.len() && !ESCAPE[self.slice[self.index] as usize] {
+            self.index += 1;
+        }
+        if self.index == self.slice.len() {
+            return error(self, ErrorCode::EofWhileParsingString);
+        }
+        match self.slice[self.index] {
+            b' ' | b'\n' | b'\t' | b'\r' => {
                 self.index += 1;
+                return Ok(());
             }
-            if self.index == self.slice.len() {
-                return error(self, ErrorCode::EofWhileParsingString);
-            }
-            match self.slice[self.index] {
-                b' ' | b'\n' | b'\t' | b'\r' => {
-                    self.index += 1;
-                    return Ok(());
-                }
-                /* b'\\' => {
-                    self.index += 1;
-                    ignore_escape(self)?;
-                } */
-                _ => {
-                    return error(self, ErrorCode::ControlCharacterWhileParsingString);
-                }
+            /* b'\\' => {
+                self.index += 1;
+                ignore_escape(self)?;
+            } */
+            _ => {
+                return error(self, ErrorCode::ControlCharacterWhileParsingString);
             }
         }
+        // }
     }
 
     fn decode_hex_escape(&mut self) -> Result<u16> {
@@ -746,12 +731,12 @@ impl<'a> Read<'a> for StrRead<'a> {
     }
 
     #[inline]
-    fn read_str<'s>(&'s mut self, len: u64) -> Result<&'a str> {
+    fn read_str<'s>(&'s mut self, len: usize) -> Result<&'a str> {
         self.delegate.read_str(len)
     }
 
     #[inline]
-    fn read_slice<'s>(&'s mut self, len: u64) -> Result<&'a [u8]> {
+    fn read_slice<'s>(&'s mut self, len: usize) -> Result<&'a [u8]> {
         self.delegate.read_slice(len)
     }
 
@@ -763,11 +748,6 @@ impl<'a> Read<'a> for StrRead<'a> {
     #[inline]
     fn str_from_scratch<'s>(&'s mut self, scratch: &'s mut Stack<u8, 32>) -> Result<&str> {
         unsafe { Ok(str::from_utf8_unchecked(scratch.get_slice())) }
-    }
-
-    #[inline]
-    fn str_or_bytes<'s>(&'s mut self, len: u64) -> Result<StrOrBytes<'a>> {
-        Ok(StrOrBytes::Str(self.read_str(len)?))
     }
 
     fn parse_str<'s>(
@@ -864,12 +844,12 @@ where
     }
 
     #[inline]
-    fn read_str<'s>(&'s mut self, len: u64) -> Result<&'de str> {
+    fn read_str<'s>(&'s mut self, len: usize) -> Result<&'de str> {
         R::read_str(self, len)
     }
 
     #[inline]
-    fn read_slice<'s>(&'s mut self, len: u64) -> Result<&'de [u8]> {
+    fn read_slice<'s>(&'s mut self, len: usize) -> Result<&'de [u8]> {
         R::read_slice(self, len)
     }
 
@@ -881,11 +861,6 @@ where
     #[inline]
     fn str_from_scratch<'s>(&'s mut self, scratch: &'s mut Stack<u8, 32>) -> Result<&str> {
         R::str_from_scratch(self, scratch)
-    }
-
-    #[inline]
-    fn str_or_bytes<'s>(&'s mut self, len: u64) -> Result<StrOrBytes<'de>> {
-        R::str_or_bytes(self, len)
     }
 
     #[inline]
