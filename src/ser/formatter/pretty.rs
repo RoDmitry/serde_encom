@@ -39,7 +39,8 @@ impl<'a> Formatter for PrettyFormatter<'a> {
     {
         self.current_indent += 1;
         self.has_value = false;
-        writer.write_all(b"{")
+        writer.write_all(b"{\n")?;
+        indent(writer, self.current_indent, self.indent)
     }
 
     #[inline]
@@ -58,7 +59,7 @@ impl<'a> Formatter for PrettyFormatter<'a> {
     }
 
     #[inline]
-    fn begin_array_value<W>(&mut self, writer: &mut W, _first: bool) -> io::Result<()>
+    fn begin_array_value<W>(&mut self, writer: &mut W) -> io::Result<()>
     where
         W: ?Sized + io::Write,
     {
@@ -82,7 +83,8 @@ impl<'a> Formatter for PrettyFormatter<'a> {
     {
         self.current_indent += 1;
         self.has_value = false;
-        writer.write_all(b"{")
+        writer.write_all(b"{\n")?;
+        indent(writer, self.current_indent, self.indent)
     }
 
     #[inline]
@@ -101,12 +103,16 @@ impl<'a> Formatter for PrettyFormatter<'a> {
     }
 
     #[inline]
-    fn begin_data_key<W>(&mut self, writer: &mut W, _first: bool) -> io::Result<()>
+    fn begin_data_key<W>(&mut self, writer: &mut W, first: bool) -> io::Result<()>
     where
         W: ?Sized + io::Write,
     {
-        writer.write_all(b"\n")?;
-        indent(writer, self.current_indent, self.indent)
+        if first {
+            Ok(())
+        } else {
+            writer.write_all(b"\n")?;
+            indent(writer, self.current_indent, self.indent)
+        }
     }
 
     #[inline]

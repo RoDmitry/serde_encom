@@ -15,7 +15,7 @@ You can try `encom_from_json!()` macro to convert your own JSON and test it. Res
 
 ## Todo:
 - [ ] Test Value deserializer
-- [ ] Pretty fix spacing
+- [x] Pretty fix spacing
 - [ ] Skip Option::None by default, and only if `#[serde(serialize_with = "path")]` is passed, then serialize None
 - [ ] Fix Stream deserializer
 - [ ] Fix File deserializer

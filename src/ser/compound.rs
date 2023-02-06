@@ -51,7 +51,7 @@ where
                     State::Initial => *state = State::RestNoClose,
                     _ => {
                         ser.formatter
-                            .begin_array_value(&mut ser.writer, false)
+                            .begin_array_value(&mut ser.writer)
                             .map_err(Error::io)?;
                     }
                 }

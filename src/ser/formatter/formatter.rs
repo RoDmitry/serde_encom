@@ -275,15 +275,11 @@ pub(crate) trait Formatter {
     /// Called before every array value.  Writes a `,` if needed to
     /// the specified writer.
     #[inline]
-    fn begin_array_value<W>(&mut self, writer: &mut W, first: bool) -> io::Result<()>
+    fn begin_array_value<W>(&mut self, writer: &mut W) -> io::Result<()>
     where
         W: ?Sized + io::Write,
     {
-        if first {
-            Ok(())
-        } else {
-            writer.write_all(b" ")
-        }
+        writer.write_all(b" ")
     }
 
     /// Called after every array value.
