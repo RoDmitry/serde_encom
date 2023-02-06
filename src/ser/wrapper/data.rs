@@ -173,6 +173,10 @@ where
 
     #[inline]
     fn serialize_unit(self) -> Result<()> {
+        self.ser
+            .formatter
+            .begin_data(&mut self.ser.writer)
+            .map_err(Error::io)?;
         self.ser.serialize_unit()
     }
 
@@ -237,10 +241,6 @@ where
 
     #[inline]
     fn serialize_none(self) -> Result<()> {
-        self.ser
-            .formatter
-            .begin_data(&mut self.ser.writer)
-            .map_err(Error::io)?;
         self.serialize_unit()
     }
 
