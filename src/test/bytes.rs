@@ -1,6 +1,6 @@
 #[test]
 fn look_at_bytes() {
-    let encom_data = b"3=\xe5\x00\xe5";
+    let encom_data = b"3~\xe5\x00\xe5";
     let bytes: &[u8] = crate::from_slice(encom_data).unwrap();
 
     println!("{bytes:?}");

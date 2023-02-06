@@ -7,7 +7,6 @@ fn test_data() {
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
-    println!("{v2}");
     let res = encom_from_json!({
         "3": {
             "2": 6,
@@ -32,7 +31,6 @@ fn test_data2() {
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
-    println!("{v2}");
     let res = encom_from_json!({
         "name": "John Doe",
         "age": 43,
@@ -52,7 +50,6 @@ fn test_seq_str_big() {
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
-    println!("{v2}");
     let res = encom_from_json!({"name": "John Doe"});
     assert_eq!(v, res);
     assert_eq!(v2, res);
@@ -65,7 +62,6 @@ fn test_map() {
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
-    println!("{v2}");
     let res = encom_from_json!({"a": 8});
     assert_eq!(v, res);
     assert_eq!(v2, res);
@@ -78,7 +74,6 @@ fn test_seq_number() {
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
-    println!("{v2}");
     let res = encom_from_json!([15]);
     assert_eq!(v, res);
     assert_eq!(v2, res);
@@ -91,7 +86,6 @@ fn test_seq_number2() {
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
-    println!("{v2}");
     let res = encom_from_json!([15, 66]);
     assert_eq!(v, res);
     assert_eq!(v2, res);
@@ -104,7 +98,6 @@ fn test_seq_map2() {
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
-    println!("{v2}");
     let res = encom_from_json!([{"a": 1}, {"d": 4}]);
     assert_eq!(v, res);
     assert_eq!(v2, res);
@@ -117,7 +110,6 @@ fn test_seq_str2() {
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
-    println!("{v2}");
     let res = encom_from_json!(["fd", "gfd"]);
     assert_eq!(v, res);
     assert_eq!(v2, res);
@@ -130,7 +122,6 @@ fn test_seq_str() {
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
-    println!("{v2}");
     let res = encom_from_json!(["a"]);
     assert_eq!(v, res);
     assert_eq!(v2, res);
@@ -143,8 +134,31 @@ fn test_seq_bytes() {
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
-    println!("{v2}");
     let res = Value::Array(vec![Value::Bytes(vec![b'a'])]);
+    assert_eq!(v, res);
+    assert_eq!(v2, res);
+}
+
+#[test]
+fn test_seq_zero_str() {
+    let data = "0=";
+    let v: Value = crate::from_str(data).unwrap();
+    let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
+
+    println!("{v}");
+    let res = encom_from_json!([""]);
+    assert_eq!(v, res);
+    assert_eq!(v2, res);
+}
+
+#[test]
+fn test_map_zero_str() {
+    let data = "str:0=";
+    let v: Value = crate::from_str(data).unwrap();
+    let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
+
+    println!("{v}");
+    let res = encom_from_json!({"str": ""});
     assert_eq!(v, res);
     assert_eq!(v2, res);
 }
@@ -156,7 +170,6 @@ fn test_null() {
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
-    println!("{v2}");
     let res = encom_from_json!({ "a": null });
     assert_eq!(v, res);
     assert_eq!(v2, res);

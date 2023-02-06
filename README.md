@@ -7,7 +7,7 @@
 
 [EnCom specification](https://github.com/RoDmitry/EnCom)
 
-As long as you use standard serialization, and don't use serde_bytes, then the serialization output will be a valid string (utf8, not binary).
+As long as you use standard serialization, and don't use `serde_bytes`, then the serialization output will be a valid string (utf8, not binary).
 
 If you use string or byte slice in your resulting structure, it will not be cloned (Zero-copy).
 
