@@ -532,7 +532,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         err.fix_position(move |code| self.error(code))
     }
 
-    fn parse_ident(&mut self, ident: &[u8]) -> Result<()> {
+    /* fn parse_ident(&mut self, ident: &[u8]) -> Result<()> {
         for expected in ident {
             match self.next_char()? {
                 None => {
@@ -547,7 +547,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         }
 
         Ok(())
-    }
+    } */
 
     fn parse_integer(&mut self, positive: bool) -> Result<ParserNumber> {
         let next = match self.next_char()? {

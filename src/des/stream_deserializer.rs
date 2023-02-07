@@ -118,7 +118,7 @@ where
     type Item = Result<T>;
 
     fn next(&mut self) -> Option<Result<T>> {
-        if R::should_early_return_if_failed && self.failed {
+        if R::SHOULD_EARLY_RETURN_IF_FAILED && self.failed {
             return None;
         }
 

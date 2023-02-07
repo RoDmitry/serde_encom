@@ -121,7 +121,7 @@ pub trait Read<'de>: private::Sealed {
     /// truncating their input slice to avoid the extra check on every next
     /// call.
     #[doc(hidden)]
-    const should_early_return_if_failed: bool;
+    const SHOULD_EARLY_RETURN_IF_FAILED: bool;
 
     /// Mark a persistent failure of StreamDeserializer, either by setting the
     /// flag or by truncating the input data.
@@ -341,11 +341,11 @@ where
         }
     }
 
-    fn read_str<'s>(&'s mut self, len: usize) -> Result<&'de str> {
+    fn read_str<'s>(&'s mut self, _len: usize) -> Result<&'de str> {
         unimplemented!()
     }
 
-    fn read_slice<'s>(&'s mut self, len: usize) -> Result<&'de [u8]> {
+    fn read_slice<'s>(&'s mut self, _len: usize) -> Result<&'de [u8]> {
         unimplemented!()
     }
 
@@ -429,7 +429,7 @@ where
         })
     }
 
-    const should_early_return_if_failed: bool = true;
+    const SHOULD_EARLY_RETURN_IF_FAILED: bool = true;
 
     #[inline]
     #[cold]
@@ -472,8 +472,8 @@ impl<'a> SliceRead<'a> {
     /// data so we avoid copying into the scratch space.
     fn parse_str_bytes<'s, T, F>(
         &'s mut self,
-        scratch: &'s mut Stack<u8, 32>,
-        validate: bool,
+        _scratch: &'s mut Stack<u8, 32>,
+        _validate: bool,
         result: F,
     ) -> Result<Reference<'a, 's, T>>
     where
@@ -622,15 +622,13 @@ impl<'a> Read<'a> for SliceRead<'a> {
         match self.slice[self.index] {
             b' ' | b'\n' | b'\t' | b'\r' => {
                 self.index += 1;
-                return Ok(());
+                Ok(())
             }
             /* b'\\' => {
                 self.index += 1;
                 ignore_escape(self)?;
             } */
-            _ => {
-                return error(self, ErrorCode::ControlCharacterWhileParsingString);
-            }
+            _ => error(self, ErrorCode::ControlCharacterWhileParsingString),
         }
         // }
     }
@@ -675,7 +673,7 @@ impl<'a> Read<'a> for SliceRead<'a> {
         })
     }
 
-    const should_early_return_if_failed: bool = false;
+    const SHOULD_EARLY_RETURN_IF_FAILED: bool = false;
 
     #[inline]
     #[cold]
@@ -796,7 +794,7 @@ impl<'a> Read<'a> for StrRead<'a> {
         })
     }
 
-    const should_early_return_if_failed: bool = false;
+    const SHOULD_EARLY_RETURN_IF_FAILED: bool = false;
 
     #[inline]
     #[cold]
@@ -904,7 +902,7 @@ where
         R::end_raw_buffering(self, visitor)
     }
 
-    const should_early_return_if_failed: bool = R::should_early_return_if_failed;
+    const SHOULD_EARLY_RETURN_IF_FAILED: bool = R::SHOULD_EARLY_RETURN_IF_FAILED;
 
     #[inline]
     fn set_failed(&mut self, failed: &mut bool) {
@@ -958,7 +956,7 @@ where
     }
 }
 
-#[inline]
+/* #[inline]
 fn peek_or_eof<'de, R>(read: &mut R) -> Result<u8>
 where
     R: ?Sized + Read<'de>,
@@ -967,7 +965,7 @@ where
         Some(b) => Ok(b),
         None => error(read, ErrorCode::EofWhileParsingString),
     }
-}
+} */
 
 fn error<'de, R, T>(read: &R, reason: ErrorCode) -> Result<T>
 where
