@@ -99,13 +99,6 @@ impl<'de> Visitor<'de> for ValueVisitor {
 
         if let Some(elem) = access.next_element()? {
             match elem {
-                /* Value::Null => {
-                    vec.push(elem);
-                    while let Some(elem) = access.next_element_seed(OtherSeed)? {
-                        vec.push(elem);
-                    }
-                } */
-                // Value::Bool(_) => {}
                 Value::Number(_) => {
                     vec.push(elem);
                     while let Some(elem) = access.next_element_seed(U64Seed)? {
@@ -124,8 +117,9 @@ impl<'de> Visitor<'de> for ValueVisitor {
                         vec.push(elem);
                     }
                 }
-                // Value::Array(_) => {todo!()}
-                // Value::Object(_) => {todo!()}
+                // Value::Null => seed is unknown at that point
+                // Value::Bool(_) => never gets here, because bool in EnCom is Value::Number
+                // Value::Array(_) | Value::Object(_) => goes to deserialize_any()
                 _ => {
                     vec.push(elem);
                     while let Some(elem) = access.next_element()? {

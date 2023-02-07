@@ -23,24 +23,18 @@ impl<'de, 'a, R: Read<'de> + 'a> de::SeqAccess<'de> for ScratchInitSeqAccess<'a,
         T: de::DeserializeSeed<'de>,
     {
         match self.des.parse_whitespace()? {
-            Some(b'}') => Err(self.des.peek_error(ErrorCode::TrailingComma)), // todo new error
-            Some(_) => seed
-                .deserialize(ScratchDeserializer {
-                    des: self.des,
-                    state: &mut self.state,
-                })
-                .map(Some),
+            Some(b'}') => return Err(self.des.peek_error(ErrorCode::TrailingComma)), // todo new error
             None => {
                 if self.state == ScratchState::None {
-                    Ok(None)
-                } else {
-                    seed.deserialize(ScratchDeserializer {
-                        des: self.des,
-                        state: &mut self.state,
-                    })
-                    .map(Some)
+                    return Ok(None);
                 }
             }
+            _ => {}
         }
+        seed.deserialize(ScratchDeserializer {
+            des: self.des,
+            state: &mut self.state,
+        })
+        .map(Some)
     }
 }
