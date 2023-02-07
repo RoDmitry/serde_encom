@@ -49,6 +49,9 @@ pub fn get_example() -> ExType {
         a18: true,
         a19: false,
         a20: None,
+        a21: -1,
+        a22: 1.5,
+        a23: -1.5,
     }]
 }
 
@@ -74,6 +77,9 @@ pub struct A1 {
     a18: bool,
     a19: bool,
     a20: Option<u64>,
+    a21: i64,
+    a22: f64,
+    a23: f64,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]

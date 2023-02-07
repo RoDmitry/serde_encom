@@ -49,6 +49,9 @@ pub fn get_example() -> ExType {
         a18: true,
         a19: false,
         a20: None,
+        a21: -1,
+        a22: 1.5,
+        a23: -1.5,
     }]
 }
 
@@ -94,6 +97,12 @@ pub struct A1 {
     a19: bool,
     #[serde(rename = "a")]
     a20: Option<u64>,
+    #[serde(rename = "s")]
+    a21: i64,
+    #[serde(rename = "d")]
+    a22: f64,
+    #[serde(rename = "f")]
+    a23: f64,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -135,7 +144,7 @@ fn self_test() {
 #[test]
 fn self_test_no_none() {
     let example = get_example();
-    let example_str = "{1:3 2:3=asd 3{3=gds 4=tmuj} 4{245 45} 5{1:21 2:2=df} 6{{1:65 2:2=ku} {1:87 2:7=h🔥ty}} 8{1:7 2{2 5 7} 1:9 3{4=aasd 2=gg 2=lk}} 7{1:3} 9{89 90} q{{1:65 2:2=ku} {1:87 2:3=hty}} w{1:23 4=afds} e{4{32 543}} r:4=fash t{5:8=dgasdfgh} y{1 3 6 8} u{1:4 1:6 1:3 1:2} i{{1 2} {3 4}} o:1 p:0}";
+    let example_str = "{1:3 2:3=asd 3{3=gds 4=tmuj} 4{245 45} 5{1:21 2:2=df} 6{{1:65 2:2=ku} {1:87 2:7=h🔥ty}} 8{1:7 2{2 5 7} 1:9 3{4=aasd 2=gg 2=lk}} 7{1:3} 9{89 90} q{{1:65 2:2=ku} {1:87 2:3=hty}} w{1:23 4=afds} e{4{32 543}} r:4=fash t{5:8=dgasdfgh} y{1 3 6 8} u{1:4 1:6 1:3 1:2} i{{1 2} {3 4}} o:1 p:0 s:-1 d:1.5 f:-1.5}";
     println!("{example_str}");
 
     let example_des: ExType = crate::des::from_slice(example_str.as_bytes()).unwrap();
