@@ -3,10 +3,11 @@ use criterion::{
 };
 // use prost::Message;
 use serde::{Deserialize, Serialize};
+use serde_encom::Value;
 
-type ExType = Vec<A1>;
+type ExType = A1;
 fn get_example() -> ExType {
-    vec![A1 {
+    A1 {
         a1: 3,
         a2: "asd".to_owned(),
         a3: vec!["gds".to_owned(), "tmuj".to_owned()],
@@ -36,7 +37,7 @@ fn get_example() -> ExType {
         a14: Some(E1::String("dgasdfgh".to_owned())),
         a15: [1, 3, 6, 8],
         a16: [E1::U64(4), E1::U64(6), E1::U64(3), E1::U64(2)],
-    }]
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -138,9 +139,18 @@ fn bench_prost_deserialize(bench_group: &mut BenchmarkGroup<WallTime>, buf: &[u8
 } */
 
 fn bench_my_deserialize_des(bench_group: &mut BenchmarkGroup<WallTime>) {
-    let data = "1:3 2:3=asd 3{3:gds 4:tmuj} 4{245 45} 5{1:21 2:2:df} 6{{1:65 2:2=ku} {1:87 2:7=h🔥ty}} 8{1:7 2{2 5 7} 1:9 3{4:aasd 2:gg 2:lk}} 7{1:3} 13:4=fash 14{5:8=dgasdfgh} 15{1 3 6 8} 16{1:4 1:6 1:3 1:2}".as_bytes();
-    bench_group.bench_with_input(BenchmarkId::new("deserialize", 1), data, |b, val| {
-        b.iter(|| serde_encom::des::from_slice::<A1>(val).unwrap())
+    let ex = get_example();
+    let data = serde_encom::to_string(&ex).unwrap();;
+    bench_group.bench_with_input(BenchmarkId::new("deserialize", 1), data.as_bytes(), |b, val| {
+        b.iter(|| serde_encom::from_slice::<A1>(val).unwrap())
+    });
+}
+
+fn bench_my_deserialize_value(bench_group: &mut BenchmarkGroup<WallTime>) {
+    let ex = get_example();
+    let data = serde_encom::to_string(&ex).unwrap();;
+    bench_group.bench_with_input(BenchmarkId::new("deserialize value", 1), data.as_bytes(), |b, val| {
+        b.iter(|| serde_encom::des::from_slice::<Value>(val).unwrap())
     });
 }
 
@@ -217,7 +227,8 @@ fn benchmark(c: &mut Criterion) {
         let data = serde_encom::ser::to_string(&example).unwrap();
         bench_my_deserialize4(&mut bench_group, data.as_bytes()); */
 
-        bench_my_deserialize_des(&mut bench_group);
+        // bench_my_deserialize_des(&mut bench_group);
+        bench_my_deserialize_value(&mut bench_group);
 
         /* bench_group.bench_with_input(BenchmarkId::new("atoi", 1), "123456789012345", |b, val| {
             b.iter(|| parse_u64(val, None).unwrap())
