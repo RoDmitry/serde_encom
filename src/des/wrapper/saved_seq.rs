@@ -1,4 +1,4 @@
-use crate::des::deserializer::{Deserializer, ScratchState};
+use crate::des::deserializer::{Deserializer, SavedType};
 use crate::des::read::Read;
 use crate::error::{Error, ErrorCode, Result};
 #[cfg(feature = "float_roundtrip")]
@@ -9,7 +9,7 @@ use serde::de;
 
 pub(crate) struct SavedSeqDeserializer<'a, 's, R> {
     pub(crate) des: &'a mut Deserializer<R>,
-    pub(crate) state: &'s mut ScratchState,
+    pub(crate) saved_type: &'s mut SavedType,
 }
 
 impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for SavedSeqDeserializer<'a, '_, R> {
@@ -25,19 +25,19 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for SavedSeqDeserializer<'a, '
         }
 
         let integer = parse(self.des.read.get_saved())?;
-        let ret = match self.state {
-            ScratchState::Str => self.des.deserialize_str_by_index(visitor, integer as usize),
-            ScratchState::Bytes => self
+        let ret = match self.saved_type {
+            SavedType::Str => self.des.deserialize_str_by_index(visitor, integer as usize),
+            SavedType::Bytes => self
                 .des
                 .deserialize_bytes_by_index(visitor, integer as usize),
-            ScratchState::Number => visitor.visit_u64(integer),
-            ScratchState::FloatNumber => {
+            SavedType::Number => visitor.visit_u64(integer),
+            SavedType::FloatNumber => {
                 ParserNumber::F64(self.des.parse_decimal(true, integer, 0)?).visit(visitor)
             }
-            ScratchState::None => Err(self.des.peek_error(ErrorCode::ExpectedSomeIdent)), // todo: new error?
+            SavedType::None => Err(self.des.peek_error(ErrorCode::ExpectedSomeIdent)), // todo: new error?
         };
         self.des.read.clear_saved();
-        *self.state = ScratchState::None;
+        *self.saved_type = SavedType::None;
         ret
     }
 

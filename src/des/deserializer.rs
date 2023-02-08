@@ -1,4 +1,4 @@
-use super::access::{MapAccess, ScratchMapAccess, ScratchSeqAccess, SeqAccess, VariantAccess};
+use super::access::{MapAccess, SavedMapAccess, SavedSeqAccess, SeqAccess, VariantAccess};
 use super::read::{IoRead, Read, Reference, SliceRead, StrRead};
 use super::{parser_number::ParserNumber, stream_deserializer::StreamDeserializer};
 use crate::error::{Error, ErrorCode, Result};
@@ -165,13 +165,13 @@ impl<'a> Deserializer<StrRead<'a>> {
 }
 
 pub(crate) enum PreParser {
-    ScratchMap,
+    SavedMap,
     Seq,
-    ScratchSeq(ScratchState),
+    SavedSeq(SavedType),
 }
 
 #[derive(PartialEq)]
-pub(crate) enum ScratchState {
+pub(crate) enum SavedType {
     Str,
     Bytes,
     Number,
@@ -323,7 +323,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         match self.peek()? {
             Some(b':') | Some(b'{') => Ok(PreParser::Text),
             Some(b'=') | Some(b'~') | Some(b' ') | Some(b'\n') | Some(b'\t') | Some(b'\r')
-            | None => Ok(PreParser::ScratchSeq),
+            | None => Ok(PreParser::SavedSeq),
             _ => Err(self.error(ErrorCode::ExpectedSomeValue)),
         }
     } */
@@ -346,16 +346,16 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         loop {
             match self.peek()? {
                 Some(b':') | Some(b'{') => {
-                    return Ok(PreParser::ScratchMap);
+                    return Ok(PreParser::SavedMap);
                 }
-                Some(b'=') => return Ok(PreParser::ScratchSeq(ScratchState::Str)),
-                Some(b'~') => return Ok(PreParser::ScratchSeq(ScratchState::Bytes)),
-                Some(b'.') => return Ok(PreParser::ScratchSeq(ScratchState::FloatNumber)),
+                Some(b'=') => return Ok(PreParser::SavedSeq(SavedType::Str)),
+                Some(b'~') => return Ok(PreParser::SavedSeq(SavedType::Bytes)),
+                Some(b'.') => return Ok(PreParser::SavedSeq(SavedType::FloatNumber)),
                 /* Some(b'e') | Some(b'E') => { // todo????
-                    return Ok(PreParser::ScratchSeq(ScratchState::ExponentNumber))
+                    return Ok(PreParser::SavedSeq(SavedState::ExponentNumber))
                 } */
                 Some(b'}') | Some(b' ') | Some(b'\n') | Some(b'\t') | Some(b'\r') | None => {
-                    return Ok(PreParser::ScratchSeq(ScratchState::Number));
+                    return Ok(PreParser::SavedSeq(SavedType::Number));
                 }
                 _ => self.eat_char(),
             }
@@ -1469,12 +1469,12 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for &'a mut Deserializer<R> {
             b'{' => {
                 self.eat_char();
                 let value = match self.any_after_x7b()? {
-                    PreParser::ScratchMap => {
-                        let value = visitor.visit_map(ScratchMapAccess::new(self));
+                    PreParser::SavedMap => {
+                        let value = visitor.visit_map(SavedMapAccess::new(self));
                         (value, self.end_map())
                     }
-                    PreParser::ScratchSeq(v) => {
-                        let value = visitor.visit_seq(ScratchSeqAccess::new(self, v));
+                    PreParser::SavedSeq(v) => {
+                        let value = visitor.visit_seq(SavedSeqAccess::new(self, v));
                         (value, self.end_seq())
                     }
                     PreParser::Seq => {

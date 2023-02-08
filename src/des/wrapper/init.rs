@@ -1,5 +1,5 @@
 use crate::des::access::{
-    InitMapAccess, InitSeqAccess, ScratchInitMapAccess, ScratchInitSeqAccess, VariantAccess,
+    InitMapAccess, InitSeqAccess, SavedInitMapAccess, SavedInitSeqAccess, VariantAccess,
 };
 use crate::des::deserializer::{Deserializer, PreParser};
 use crate::des::read::Read;
@@ -28,12 +28,12 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for InitDeserializer<'a, R> {
         }; */
 
         let value = match self.des.any_after_x7b()? {
-            PreParser::ScratchMap => {
-                let value = visitor.visit_map(ScratchInitMapAccess::new(self.des));
+            PreParser::SavedMap => {
+                let value = visitor.visit_map(SavedInitMapAccess::new(self.des));
                 (value, self.des.end_map_init())
             }
-            PreParser::ScratchSeq(s) => {
-                let value = visitor.visit_seq(ScratchInitSeqAccess::new(self.des, s));
+            PreParser::SavedSeq(s) => {
+                let value = visitor.visit_seq(SavedInitSeqAccess::new(self.des, s));
                 (value, self.des.end_seq_init())
             }
             PreParser::Seq => {

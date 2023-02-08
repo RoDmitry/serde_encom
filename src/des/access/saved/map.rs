@@ -4,19 +4,19 @@ use crate::des::{deserializer::Deserializer, read::Read};
 use crate::error::{Error, Result};
 use serde::de;
 
-pub(crate) struct ScratchMapAccess<'a, R: 'a> {
+pub(crate) struct SavedMapAccess<'a, R: 'a> {
     des: MapAccess<'a, R>,
 }
 
-impl<'a, R: 'a> ScratchMapAccess<'a, R> {
+impl<'a, R: 'a> SavedMapAccess<'a, R> {
     pub(crate) fn new(des: &'a mut Deserializer<R>) -> Self {
-        ScratchMapAccess {
+        SavedMapAccess {
             des: MapAccess { des },
         }
     }
 }
 
-impl<'de, 'a, R: Read<'de> + 'a> de::MapAccess<'de> for ScratchMapAccess<'a, R> {
+impl<'de, 'a, R: Read<'de> + 'a> de::MapAccess<'de> for SavedMapAccess<'a, R> {
     type Error = Error;
 
     fn next_key_seed<K>(&mut self, seed: K) -> Result<Option<K::Value>>
