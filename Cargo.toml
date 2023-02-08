@@ -15,9 +15,6 @@ edition = "2018"
 name = "serde_encom"
 path = "src/lib.rs"
 
-#[workspace.dependencies]
-#stack = { version = "0.1", path = "./stack" }
-
 [dependencies]
 #stack = { workspace = true }
 serde = { version = "1.0", features = ["derive"] }
@@ -30,7 +27,6 @@ atoi_simd = "0.7"
 [dev-dependencies]
 criterion = { version = "0.4", features = ["html_reports"] }
 serde_bytes = "0.11"
-# des_buffer = { version = "0.1", path = "./des_buffer" }
 # serde_json = "1.0"
 
 [[bench]]
