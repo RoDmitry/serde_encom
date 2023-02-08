@@ -301,6 +301,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
     pub(crate) fn parse_whitespace(&mut self) -> Result<Option<u8>> {
         loop {
             match self.peek()? {
+                /* Some(b' ') | Some(b'\n') | Some(b'\t') | Some(b'\r') */
                 Some(ch) if ch < 0x21 => {
                     self.eat_char();
                 }
@@ -308,38 +309,8 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                     return Ok(other);
                 }
             }
-            /* match self.peek()? {
-                Some(b' ') | Some(b'\n') | Some(b'\t') | Some(b'\r') => {
-                    self.eat_char();
-                }
-                other => {
-                    return Ok(other);
-                }
-            } */
         }
     }
-
-    /* pub(crate) fn where_am_i_map(&mut self) -> Result<PreParser> {
-        match self.peek()? {
-            Some(b':') | Some(b'{') => Ok(PreParser::Text),
-            Some(b'=') | Some(b'~') | Some(b' ') | Some(b'\n') | Some(b'\t') | Some(b'\r')
-            | None => Ok(PreParser::SavedSeq),
-            _ => Err(self.error(ErrorCode::ExpectedSomeValue)),
-        }
-    } */
-
-    /* pub(crate) fn any_where_am_i_seq(&mut self) -> Result<PreParserSeq> {
-        match self.peek()? {
-            Some(b'=') => Ok(PreParserSeq::Str),
-            Some(b'~') => Ok(PreParserSeq::Bytes),
-            Some(b'-') => Ok(PreParserSeq::NegNumber),
-            Some(b'.') => Ok(PreParserSeq::FloatNumber),
-            Some(b'}') | Some(b' ') | Some(b'\n') | Some(b'\t') | Some(b'\r') | None => {
-                Ok(PreParserSeq::Number)
-            }
-            _ => Err(self.error(ErrorCode::ExpectedSomeValue)),
-        }
-    } */
 
     #[inline]
     fn pre_parser_match(&mut self) -> Result<PreParser> {
@@ -387,6 +358,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         }
     }
 
+    #[inline]
     pub(crate) fn deserialize_str_by_index<V>(&mut self, visitor: V, i: usize) -> Result<V::Value>
     where
         V: de::Visitor<'de>,
@@ -397,6 +369,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         res
     }
 
+    #[inline]
     pub(crate) fn deserialize_bytes_by_index<V>(&mut self, visitor: V, i: usize) -> Result<V::Value>
     where
         V: de::Visitor<'de>,
@@ -413,7 +386,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         V: de::Visitor<'de>,
     {
         let integer = self.read.read_int_until_invalid()?;
-        match self.peek()? {
+        let ret = match self.peek()? {
             Some(b'=') => self.deserialize_str_by_index(visitor, integer as usize),
             Some(b'~') => self.deserialize_bytes_by_index(visitor, integer as usize),
             Some(b'.') => ParserNumber::F64(self.parse_decimal(true, integer, 0)?).visit(visitor),
@@ -424,7 +397,9 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                 ParserNumber::U64(integer).visit(visitor)
             }
             Some(_) => Err(self.error(ErrorCode::ExpectedSomeIdent)), // todo: new error?
-        }
+        };
+        self.read.clear_saved();
+        ret
     }
 
     #[cold]
@@ -1467,39 +1442,29 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for &'a mut Deserializer<R> {
                 }
             } */
             b'{' => {
-                self.eat_char();
-                let value = match self.any_after_x7b()? {
-                    PreParser::SavedMap => {
-                        let value = visitor.visit_map(SavedMapAccess::new(self));
-                        (value, self.end_map())
-                    }
-                    PreParser::SavedSeq(v) => {
-                        let value = visitor.visit_seq(SavedSeqAccess::new(self, v));
-                        (value, self.end_seq())
-                    }
-                    PreParser::Seq => {
-                        let value = visitor.visit_seq(SeqAccess::new(self));
-                        (value, self.end_seq())
-                    }
-                };
+                check_recursion! {
+                    self.eat_char();
+                    let value = match self.any_after_x7b()? {
+                        PreParser::SavedMap => {
+                            let value = visitor.visit_map(SavedMapAccess::new(self));
+                            (value, self.end_map())
+                        }
+                        PreParser::SavedSeq(v) => {
+                            let value = visitor.visit_seq(SavedSeqAccess::new(self, v));
+                            (value, self.end_seq())
+                        }
+                        PreParser::Seq => {
+                            let value = visitor.visit_seq(SeqAccess::new(self));
+                            (value, self.end_seq())
+                        }
+                    };
+                }
                 match value {
                     (Ok(ret), Ok(())) => Ok(ret),
                     (Err(err), _) | (_, Err(err)) => Err(err),
                 }
-                /* check_recursion! {
-                    self.eat_char();
-                    let ret = visitor.visit_map(MapAccess::new(self));
-                }
-                match (ret, self.end_map()) {
-                    (Ok(ret), Ok(())) => Ok(ret),
-                    (Err(err), _) | (_, Err(err)) => Err(err),
-                } */
             }
-            _ => {
-                let ret = self.any_map_value(visitor);
-                self.read.clear_saved();
-                ret
-            } // _ => Err(self.peek_error(ErrorCode::ExpectedSomeValue)),
+            _ => self.any_map_value(visitor),
         };
 
         match value {
