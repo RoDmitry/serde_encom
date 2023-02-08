@@ -467,9 +467,9 @@ where
 
 //////////////////////////////////////////////////////////////////////////////
 
-impl<'a> SliceRead<'a> {
+impl<'de> SliceRead<'de> {
     /// Create a EnCom input source to read from a slice of bytes.
-    pub fn new(slice: &'a [u8]) -> Self {
+    pub fn new(slice: &'de [u8]) -> Self {
         SliceRead {
             slice,
             index: 0,
@@ -504,7 +504,7 @@ impl<'a> SliceRead<'a> {
         _scratch: &'s mut Vec<u8>,
         _validate: bool,
         result: F,
-    ) -> Result<Reference<'a, 's, T>>
+    ) -> Result<Reference<'de, 's, T>>
     where
         T: ?Sized + 's,
         F: for<'f> FnOnce(&'s Self, &'f [u8]) -> Result<&'f T>,
@@ -550,9 +550,9 @@ impl<'a> SliceRead<'a> {
     }
 }
 
-impl<'a> private::Sealed for SliceRead<'a> {}
+impl<'de> private::Sealed for SliceRead<'de> {}
 
-impl<'a> Read<'a> for SliceRead<'a> {
+impl<'de> Read<'de> for SliceRead<'de> {
     #[inline]
     fn next(&mut self) -> Result<Option<u8>> {
         // `Ok(self.slice.get(self.index).map(|ch| { self.index += 1; *ch }))`
@@ -600,14 +600,14 @@ impl<'a> Read<'a> for SliceRead<'a> {
     }
 
     #[inline]
-    fn read_str<'s>(&'s mut self, len: usize) -> Result<&'a str> {
+    fn read_str<'s>(&'s mut self, len: usize) -> Result<&'de str> {
         let start = self.index;
         self.index += len;
         as_str(self, &self.slice[start..self.index])
     }
 
     #[inline]
-    fn read_slice<'s>(&'s mut self, len: usize) -> Result<&'a [u8]> {
+    fn read_slice<'s>(&'s mut self, len: usize) -> Result<&'de [u8]> {
         let start = self.index;
         self.index += len;
         Ok(&self.slice[start..self.index])
@@ -626,7 +626,7 @@ impl<'a> Read<'a> for SliceRead<'a> {
     }
 
     #[inline]
-    fn parse_str<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<Reference<'a, 's, str>> {
+    fn parse_str<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<Reference<'de, 's, str>> {
         self.parse_str_bytes(scratch, true, as_str)
     }
 
@@ -634,7 +634,7 @@ impl<'a> Read<'a> for SliceRead<'a> {
     fn parse_str_raw<'s>(
         &'s mut self,
         scratch: &'s mut Vec<u8>,
-    ) -> Result<Reference<'a, 's, [u8]>> {
+    ) -> Result<Reference<'de, 's, [u8]>> {
         self.parse_str_bytes(scratch, false, |_, bytes| Ok(bytes))
     }
 
@@ -688,7 +688,7 @@ impl<'a> Read<'a> for SliceRead<'a> {
     #[cfg(feature = "raw_value")]
     fn end_raw_buffering<V>(&mut self, visitor: V) -> Result<V::Value>
     where
-        V: Visitor<'a>,
+        V: Visitor<'de>,
     {
         let raw = &self.slice[self.raw_buffering_start_index..self.index];
         let raw = match str::from_utf8(raw) {
@@ -721,7 +721,7 @@ impl<'a> Read<'a> for SliceRead<'a> {
         self.save_end = self.save_start;
     }
     #[inline]
-    fn get_saved(&mut self) -> &'a [u8] {
+    fn get_saved(&mut self) -> &'de [u8] {
         &self.slice[self.save_start..self.save_end]
     }
     #[inline]
@@ -743,9 +743,9 @@ impl<'a> StrRead<'a> {
     }
 }
 
-impl<'a> private::Sealed for StrRead<'a> {}
+impl<'de> private::Sealed for StrRead<'de> {}
 
-impl<'a> Read<'a> for StrRead<'a> {
+impl<'de> Read<'de> for StrRead<'de> {
     #[inline]
     fn next(&mut self) -> Result<Option<u8>> {
         self.delegate.next()
@@ -777,12 +777,12 @@ impl<'a> Read<'a> for StrRead<'a> {
     }
 
     #[inline]
-    fn read_str<'s>(&'s mut self, len: usize) -> Result<&'a str> {
+    fn read_str<'s>(&'s mut self, len: usize) -> Result<&'de str> {
         self.delegate.read_str(len)
     }
 
     #[inline]
-    fn read_slice<'s>(&'s mut self, len: usize) -> Result<&'a [u8]> {
+    fn read_slice<'s>(&'s mut self, len: usize) -> Result<&'de [u8]> {
         self.delegate.read_slice(len)
     }
 
@@ -796,7 +796,7 @@ impl<'a> Read<'a> for StrRead<'a> {
         unsafe { Ok(str::from_utf8_unchecked(self.get_saved())) }
     }
 
-    fn parse_str<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<Reference<'a, 's, str>> {
+    fn parse_str<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<Reference<'de, 's, str>> {
         self.delegate.parse_str_bytes(scratch, true, |_, bytes| {
             // The deserialization input came in as &str with a UTF-8 guarantee,
             // and the \u-escapes are checked along the way, so don't need to
@@ -808,7 +808,7 @@ impl<'a> Read<'a> for StrRead<'a> {
     fn parse_str_raw<'s>(
         &'s mut self,
         scratch: &'s mut Vec<u8>,
-    ) -> Result<Reference<'a, 's, [u8]>> {
+    ) -> Result<Reference<'de, 's, [u8]>> {
         self.delegate.parse_str_raw(scratch)
     }
 
@@ -831,7 +831,7 @@ impl<'a> Read<'a> for StrRead<'a> {
     #[cfg(feature = "raw_value")]
     fn end_raw_buffering<V>(&mut self, visitor: V) -> Result<V::Value>
     where
-        V: Visitor<'a>,
+        V: Visitor<'de>,
     {
         let raw = &self.data[self.delegate.raw_buffering_start_index..self.delegate.index];
         visitor.visit_map(BorrowedRawDeserializer {
@@ -860,7 +860,7 @@ impl<'a> Read<'a> for StrRead<'a> {
         self.delegate.clear_saved()
     }
     #[inline]
-    fn get_saved(&mut self) -> &'a [u8] {
+    fn get_saved(&mut self) -> &'de [u8] {
         self.delegate.get_saved()
     }
     #[inline]
