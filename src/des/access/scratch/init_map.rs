@@ -1,5 +1,5 @@
 use super::super::InitMapAccess;
-use crate::des::wrapper::ScratchMapKeyDeserializer;
+use crate::des::wrapper::SavedMapKeyDeserializer;
 use crate::des::{deserializer::Deserializer, read::Read};
 use crate::error::{Error, Result};
 use serde::de;
@@ -26,7 +26,7 @@ impl<'de, 'a, R: Read<'de> + 'a> de::MapAccess<'de> for ScratchInitMapAccess<'a,
         if self.des.des.read.saved_is_empty() {
             self.des.next_key_seed(seed)
         } else {
-            seed.deserialize(ScratchMapKeyDeserializer { des: self.des.des })
+            seed.deserialize(SavedMapKeyDeserializer { des: self.des.des })
                 .map(Some)
         }
     }

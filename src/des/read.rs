@@ -3,7 +3,6 @@
 use crate::error::{Error, ErrorCode, Result};
 // use alloc::vec::Vec;
 // use core::char;
-use super::stack::Stack;
 use atoi_simd::parse_until_invalid_pos;
 use core::cmp;
 use core::ops::Deref;

@@ -1,5 +1,5 @@
 use crate::des::deserializer::ScratchState;
-use crate::des::wrapper::ScratchDeserializer;
+use crate::des::wrapper::SavedSeqDeserializer;
 use crate::des::{deserializer::Deserializer, read::Read};
 use crate::error::{Error, ErrorCode, Result};
 use serde::de;
@@ -31,7 +31,7 @@ impl<'de, 'a, R: Read<'de> + 'a> de::SeqAccess<'de> for ScratchInitSeqAccess<'a,
             }
             _ => {}
         }
-        seed.deserialize(ScratchDeserializer {
+        seed.deserialize(SavedSeqDeserializer {
             des: self.des,
             state: &mut self.state,
         })

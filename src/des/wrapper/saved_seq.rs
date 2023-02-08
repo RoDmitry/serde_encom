@@ -7,12 +7,12 @@ use crate::parser_number::ParserNumber;
 use atoi_simd::parse;
 use serde::de;
 
-pub(crate) struct ScratchDeserializer<'a, 's, R> {
+pub(crate) struct SavedSeqDeserializer<'a, 's, R> {
     pub(crate) des: &'a mut Deserializer<R>,
     pub(crate) state: &'s mut ScratchState,
 }
 
-impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for ScratchDeserializer<'a, '_, R> {
+impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for SavedSeqDeserializer<'a, '_, R> {
     type Error = Error;
 
     #[inline]

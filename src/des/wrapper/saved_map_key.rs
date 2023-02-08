@@ -6,7 +6,7 @@ use serde::forward_to_deserialize_any;
 
 /// Only deserialize from this after peeking a '"' byte! Otherwise it may
 /// deserialize invalid EnCom successfully.
-pub(crate) struct ScratchMapKeyDeserializer<'a, R: 'a> {
+pub(crate) struct SavedMapKeyDeserializer<'a, R: 'a> {
     pub(crate) des: &'a mut Deserializer<R>,
 }
 
@@ -28,7 +28,7 @@ macro_rules! deserialize_integer_key {
     };
 }
 
-impl<'de, 'a, R> de::Deserializer<'de> for ScratchMapKeyDeserializer<'a, R>
+impl<'de, 'a, R> de::Deserializer<'de> for SavedMapKeyDeserializer<'a, R>
 where
     R: Read<'de>,
 {

@@ -5,7 +5,6 @@ mod deserializer;
 mod iter;
 pub(crate) mod parser_number;
 mod read;
-pub(crate) mod stack;
 mod stream_deserializer;
 mod wrapper;
 
