@@ -42,7 +42,7 @@ where
         // self.des.eat_char();
         // self.des.scratch.reset();
         // visitor.visit_borrowed_bytes(self.des.scratch.get_slice())
-        let value = visitor.visit_str(self.des.read.str_from_saved()?);
+        let value = visitor.visit_borrowed_str(self.des.read.str_from_saved()?);
         self.des.read.clear_saved();
         value
     }

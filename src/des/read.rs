@@ -66,7 +66,7 @@ pub trait Read<'de>: private::Sealed {
 
     fn read_int_until_invalid(&mut self) -> Result<u64>;
 
-    fn str_from_saved(&mut self) -> Result<&str>;
+    fn str_from_saved(&mut self) -> Result<&'de str>;
 
     /// Assumes the previous byte was a quotation mark. Parses a EnCom-escaped
     /// string until the next quotation mark using the given scratch space if
@@ -74,14 +74,14 @@ pub trait Read<'de>: private::Sealed {
     #[doc(hidden)]
     fn parse_str<'s>(&'s mut self) -> Result<Reference<'de, 's, str>>;
 
-    /// Assumes the previous byte was a quotation mark. Parses a EnCom-escaped
-    /// string until the next quotation mark using the given scratch space if
-    /// necessary. The scratch space is initially empty.
-    ///
-    /// This function returns the raw bytes in the string with escape sequences
-    /// expanded but without performing unicode validation.
-    #[doc(hidden)]
-    fn parse_str_raw<'s>(&'s mut self) -> Result<Reference<'de, 's, [u8]>>;
+    // Assumes the previous byte was a quotation mark. Parses a EnCom-escaped
+    // string until the next quotation mark using the given scratch space if
+    // necessary. The scratch space is initially empty.
+    //
+    // This function returns the raw bytes in the string with escape sequences
+    // expanded but without performing unicode validation.
+    //#[doc(hidden)]
+    //fn parse_str_raw<'s>(&'s mut self) -> Result<Reference<'de, 's, [u8]>>;
 
     /// Assumes the previous byte was a quotation mark. Parses a EnCom-escaped
     /// string until the next quotation mark but discards the data.
@@ -353,7 +353,7 @@ where
     }
 
     #[inline]
-    fn str_from_saved(&mut self) -> Result<&str> {
+    fn str_from_saved(&mut self) -> Result<&'de str> {
         let saved = self.get_saved();
         as_str(self, saved)
     }
@@ -363,11 +363,11 @@ where
         self.parse_str_bytes(true, as_str).map(Reference::Copied)
     }
 
-    #[inline]
+    /* #[inline]
     fn parse_str_raw<'s>(&'s mut self) -> Result<Reference<'de, 's, [u8]>> {
         self.parse_str_bytes(false, |_, bytes| Ok(bytes))
             .map(Reference::Copied)
-    }
+    } */
 
     fn ignore_str(&mut self) -> Result<()> {
         loop {
@@ -493,7 +493,7 @@ impl<'de> SliceRead<'de> {
     ) -> Result<Reference<'de, 's, T>>
     where
         T: ?Sized + 's,
-        F: for<'f> FnOnce(&'s Self, &'f [u8]) -> Result<&'f T>,
+        F: FnOnce(&'s Self, &'de [u8]) -> Result<&'de T>,
     {
         // Index of the first byte not yet copied into the scratch space.
         let start = self.index;
@@ -606,7 +606,7 @@ impl<'de> Read<'de> for SliceRead<'de> {
     }
 
     #[inline]
-    fn str_from_saved(&mut self) -> Result<&str> {
+    fn str_from_saved(&mut self) -> Result<&'de str> {
         let saved = self.get_saved();
         as_str(self, saved)
     }
@@ -616,10 +616,10 @@ impl<'de> Read<'de> for SliceRead<'de> {
         self.parse_str_bytes(true, as_str)
     }
 
-    #[inline]
+    /* #[inline]
     fn parse_str_raw<'s>(&'s mut self) -> Result<Reference<'de, 's, [u8]>> {
         self.parse_str_bytes(false, |_, bytes| Ok(bytes))
-    }
+    } */
 
     fn ignore_str(&mut self) -> Result<()> {
         // loop {
@@ -775,10 +775,11 @@ impl<'de> Read<'de> for StrRead<'de> {
     }
 
     #[inline]
-    fn str_from_saved(&mut self) -> Result<&str> {
+    fn str_from_saved(&mut self) -> Result<&'de str> {
         unsafe { Ok(str::from_utf8_unchecked(self.get_saved())) }
     }
 
+    #[inline]
     fn parse_str<'s>(&'s mut self) -> Result<Reference<'de, 's, str>> {
         self.delegate.parse_str_bytes(true, |_, bytes| {
             // The deserialization input came in as &str with a UTF-8 guarantee,
@@ -788,9 +789,9 @@ impl<'de> Read<'de> for StrRead<'de> {
         })
     }
 
-    fn parse_str_raw<'s>(&'s mut self) -> Result<Reference<'de, 's, [u8]>> {
+    /* fn parse_str_raw<'s>(&'s mut self) -> Result<Reference<'de, 's, [u8]>> {
         self.delegate.parse_str_raw()
-    }
+    } */
 
     #[inline]
     fn ignore_str(&mut self) -> Result<()> {
@@ -903,7 +904,7 @@ where
     }
 
     #[inline]
-    fn str_from_saved(&mut self) -> Result<&str> {
+    fn str_from_saved(&mut self) -> Result<&'de str> {
         R::str_from_saved(self)
     }
 
@@ -912,10 +913,10 @@ where
         R::parse_str(self)
     }
 
-    #[inline]
+    /* #[inline]
     fn parse_str_raw<'s>(&'s mut self) -> Result<Reference<'de, 's, [u8]>> {
         R::parse_str_raw(self)
-    }
+    } */
 
     #[inline]
     fn ignore_str(&mut self) -> Result<()> {

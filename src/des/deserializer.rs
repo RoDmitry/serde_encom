@@ -359,23 +359,23 @@ impl<'de, R: Read<'de>> Deserializer<R> {
     }
 
     #[inline]
-    pub(crate) fn deserialize_str_by_index<V>(&mut self, visitor: V, i: usize) -> Result<V::Value>
+    pub(crate) fn deserialize_str_by_len<V>(&mut self, visitor: V, len: usize) -> Result<V::Value>
     where
         V: de::Visitor<'de>,
     {
         self.eat_char();
-        let res = visitor.visit_borrowed_str(self.read.read_str(i)?);
+        let res = visitor.visit_borrowed_str(self.read.read_str(len)?);
         self.end_of_str_or_bytes()?;
         res
     }
 
     #[inline]
-    pub(crate) fn deserialize_bytes_by_index<V>(&mut self, visitor: V, i: usize) -> Result<V::Value>
+    pub(crate) fn deserialize_bytes_by_len<V>(&mut self, visitor: V, len: usize) -> Result<V::Value>
     where
         V: de::Visitor<'de>,
     {
         self.eat_char();
-        let res = visitor.visit_borrowed_bytes(self.read.read_slice(i)?);
+        let res = visitor.visit_borrowed_bytes(self.read.read_slice(len)?);
         self.end_of_str_or_bytes()?;
         res
     }
@@ -385,16 +385,16 @@ impl<'de, R: Read<'de>> Deserializer<R> {
     where
         V: de::Visitor<'de>,
     {
-        let integer = self.read.read_int_until_invalid()?;
+        let parsed_int = self.read.read_int_until_invalid()?;
         let ret = match self.peek()? {
-            Some(b'=') => self.deserialize_str_by_index(visitor, integer as usize),
-            Some(b'~') => self.deserialize_bytes_by_index(visitor, integer as usize),
-            Some(b'.') => ParserNumber::F64(self.parse_decimal(true, integer, 0)?).visit(visitor),
+            Some(b'=') => self.deserialize_str_by_len(visitor, parsed_int as usize),
+            Some(b'~') => self.deserialize_bytes_by_len(visitor, parsed_int as usize),
+            Some(b'.') => visitor.visit_f64(self.parse_decimal(true, parsed_int, 0)?),
             /* Some(b'e') | Some(b'E') => {
                 ParserNumber::F64(self.parse_exponent(true, integer, 0)?).visit(visitor)
             } */
             Some(b'}') | Some(b' ') | Some(b'\n') | Some(b'\t') | Some(b'\r') | None => {
-                ParserNumber::U64(integer).visit(visitor)
+                visitor.visit_u64(parsed_int)
             }
             Some(_) => Err(self.error(ErrorCode::ExpectedSomeIdent)), // todo: new error?
         };
@@ -1615,7 +1615,7 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for &'a mut Deserializer<R> {
 
         // takes str len before :
         let value = if let ParserNumber::U64(len) = self.parse_integer(true)? {
-            self.deserialize_str_by_index(visitor, len as usize)
+            self.deserialize_str_by_len(visitor, len as usize)
         } else {
             Err(self.peek_invalid_type(&visitor))
         };
@@ -1723,7 +1723,7 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for &'a mut Deserializer<R> {
         }; */
 
         let value = if let ParserNumber::U64(len) = self.parse_integer(true)? {
-            self.deserialize_bytes_by_index(visitor, len as usize)
+            self.deserialize_bytes_by_len(visitor, len as usize)
         } else {
             Err(self.peek_invalid_type(&visitor))
         };
@@ -1990,7 +1990,7 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for &'a mut Deserializer<R> {
         };
 
         let value = {
-            self.read.clear_saved();
+            // self.read.clear_saved();
             match self.read.parse_str()? {
                 Reference::Borrowed(s) => visitor.visit_borrowed_str(s),
                 Reference::Copied(s) => visitor.visit_str(s),

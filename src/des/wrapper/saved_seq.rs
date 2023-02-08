@@ -3,7 +3,6 @@ use crate::des::read::Read;
 use crate::error::{Error, ErrorCode, Result};
 #[cfg(feature = "float_roundtrip")]
 use crate::lexical;
-use crate::parser_number::ParserNumber;
 use atoi_simd::parse;
 use serde::de;
 
@@ -20,19 +19,21 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for SavedSeqDeserializer<'a, '
     where
         V: de::Visitor<'de>,
     {
-        if self.des.read.saved_is_empty() {
+        /* if self.des.read.saved_is_empty() {
             return Err(self.des.peek_error(ErrorCode::EofWhileParsingList)); // todo: change err?
-        }
+        } */
 
-        let integer = parse(self.des.read.get_saved())?;
+        let parsed_int = parse(self.des.read.get_saved())?;
         let ret = match self.saved_type {
-            SavedType::Str => self.des.deserialize_str_by_index(visitor, integer as usize),
+            SavedType::Str => self
+                .des
+                .deserialize_str_by_len(visitor, parsed_int as usize),
             SavedType::Bytes => self
                 .des
-                .deserialize_bytes_by_index(visitor, integer as usize),
-            SavedType::Number => visitor.visit_u64(integer),
+                .deserialize_bytes_by_len(visitor, parsed_int as usize),
+            SavedType::Number => visitor.visit_u64(parsed_int),
             SavedType::FloatNumber => {
-                ParserNumber::F64(self.des.parse_decimal(true, integer, 0)?).visit(visitor)
+                visitor.visit_f64(self.des.parse_decimal(true, parsed_int, 0)?)
             }
             SavedType::None => Err(self.des.peek_error(ErrorCode::ExpectedSomeIdent)), // todo: new error?
         };
