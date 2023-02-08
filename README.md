@@ -9,7 +9,7 @@
 
 As long as you use standard serialization, and don't use `serde_bytes`, then the serialization output will be a valid string (utf8, not binary).
 
-If you use string or byte slice in your resulting structure, it will not be cloned (Zero-copy).
+If you are using string `&str` or byte `&[u8]` slice in your resulting structure, it will not be copied (Zero-copy).
 
 You can try `encom_from_json!()` macro to convert your own JSON and test it. Resulting EnCom will be sorted alphabetically.
 

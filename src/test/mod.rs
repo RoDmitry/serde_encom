@@ -51,7 +51,7 @@ fn big_json() {
                     "init-param": {
                         "cacheTemplatesStore": null,
                         "cacheTemplatesTrack": 100,
-                        "configGlossary:poweredBy": "Cofax",
+                        "configGlossary-poweredBy": "Cofax",
                         "dataStoreMaxConns": 100,
                         "dataStoreName": "cofax",
                         "maxUrlLength": 500,
