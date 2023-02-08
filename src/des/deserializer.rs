@@ -578,12 +578,12 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                 return self.parse_number(positive, parse(self.scratch.get_slice()).unwrap()); */
 
                 // Original version
-                let mut significand = (c - b'0') as u64;
+                let mut significand = (c & 0xF) as u64;
 
                 loop {
                     match self.peek_or_null()? {
                         c @ b'0'..=b'9' => {
-                            let digit = (c - b'0') as u64;
+                            let digit = (c & 0xF) as u64;
 
                             // We need to be careful with overflow. If we can,
                             // try to keep the number as a `u64` until we grow
@@ -639,7 +639,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
 
         let mut exponent_after_decimal_point = 0;
         while let c @ b'0'..=b'9' = self.peek_or_null()? {
-            let digit = (c - b'0') as u64;
+            let digit = (c & 0xF) as u64;
 
             if overflow!(significand * 10 + digit, u64::max_value()) {
                 let exponent = exponent_before_decimal_point + exponent_after_decimal_point;
@@ -695,7 +695,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
 
         // Make sure a digit follows the exponent place.
         let mut exp = match next {
-            c @ b'0'..=b'9' => (c - b'0') as i32,
+            c @ b'0'..=b'9' => (c & 0xF) as i32,
             _ => {
                 return Err(self.error(ErrorCode::InvalidNumber));
             }
@@ -703,7 +703,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
 
         while let c @ b'0'..=b'9' = self.peek_or_null()? {
             self.eat_char();
-            let digit = (c - b'0') as i32;
+            let digit = (c & 0xF) as i32;
 
             if overflow!(exp * 10 + digit, i32::max_value()) {
                 let zero_significand = significand == 0;
@@ -887,7 +887,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
 
         // Make sure a digit follows the exponent place.
         let mut exp = match next {
-            c @ b'0'..=b'9' => (c - b'0') as i32,
+            c @ b'0'..=b'9' => (c & 0xF) as i32,
             _ => {
                 return Err(self.error(ErrorCode::InvalidNumber));
             }
@@ -895,7 +895,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
 
         while let c @ b'0'..=b'9' = tri!(self.peek_or_null()) {
             self.eat_char();
-            let digit = (c - b'0') as i32;
+            let digit = (c & 0xF) as i32;
 
             if overflow!(exp * 10 + digit, i32::max_value()) {
                 let zero_significand = self.scratch.iter().all(|&digit| digit == b'0');
