@@ -23,7 +23,7 @@ impl<'de, 'a, R: Read<'de> + 'a> de::MapAccess<'de> for ScratchInitMapAccess<'a,
     where
         K: de::DeserializeSeed<'de>,
     {
-        if self.des.des.scratch.is_empty() {
+        if self.des.des.read.saved_is_empty() {
             self.des.next_key_seed(seed)
         } else {
             seed.deserialize(ScratchMapKeyDeserializer { des: self.des.des })

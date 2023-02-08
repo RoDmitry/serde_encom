@@ -20,11 +20,11 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for ScratchDeserializer<'a, '_
     where
         V: de::Visitor<'de>,
     {
-        if self.des.scratch.is_empty() {
+        if self.des.read.saved_is_empty() {
             return Err(self.des.peek_error(ErrorCode::EofWhileParsingList)); // todo: change err?
         }
 
-        let integer = parse(&self.des.scratch)?;
+        let integer = parse(self.des.read.get_saved())?;
         let ret = match self.state {
             ScratchState::Str => self.des.deserialize_str_by_index(visitor, integer as usize),
             ScratchState::Bytes => self
@@ -36,7 +36,7 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for ScratchDeserializer<'a, '_
             }
             ScratchState::None => Err(self.des.peek_error(ErrorCode::ExpectedSomeIdent)), // todo: new error?
         };
-        self.des.scratch.clear();
+        self.des.read.clear_saved();
         *self.state = ScratchState::None;
         ret
     }

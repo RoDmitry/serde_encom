@@ -68,7 +68,7 @@ pub trait Read<'de>: private::Sealed {
 
     fn read_int_until_invalid(&mut self) -> Result<u64>;
 
-    fn str_from_scratch<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<&str>;
+    fn str_from_saved(&mut self) -> Result<&str>;
 
     /// Assumes the previous byte was a quotation mark. Parses a EnCom-escaped
     /// string until the next quotation mark using the given scratch space if
@@ -124,6 +124,12 @@ pub trait Read<'de>: private::Sealed {
     /// flag or by truncating the input data.
     #[doc(hidden)]
     fn set_failed(&mut self, failed: &mut bool);
+
+    fn save_start(&mut self);
+    fn save_end(&mut self);
+    fn clear_saved(&mut self);
+    fn get_saved(&mut self) -> &'de [u8];
+    fn saved_is_empty(&self) -> bool;
 }
 
 pub struct Position {
@@ -177,6 +183,8 @@ pub struct SliceRead<'a> {
     index: usize,
     #[cfg(feature = "raw_value")]
     raw_buffering_start_index: usize,
+    save_start: usize,
+    save_end: usize,
 }
 
 /// EnCom input source that reads from a UTF-8 string.
@@ -338,21 +346,25 @@ where
         }
     }
 
+    #[inline]
     fn read_str<'s>(&'s mut self, _len: usize) -> Result<&'de str> {
         unimplemented!()
     }
 
+    #[inline]
     fn read_slice<'s>(&'s mut self, _len: usize) -> Result<&'de [u8]> {
         unimplemented!()
     }
 
+    #[inline]
     fn read_int_until_invalid(&mut self) -> Result<u64> {
         unimplemented!()
     }
 
     #[inline]
-    fn str_from_scratch<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<&str> {
-        as_str(self, scratch)
+    fn str_from_saved(&mut self) -> Result<&str> {
+        let saved = self.get_saved();
+        as_str(self, saved)
     }
 
     #[inline]
@@ -430,6 +442,27 @@ where
     fn set_failed(&mut self, failed: &mut bool) {
         *failed = true;
     }
+
+    #[inline]
+    fn save_start(&mut self) {
+        unimplemented!()
+    }
+    #[inline]
+    fn save_end(&mut self) {
+        unimplemented!()
+    }
+    #[inline]
+    fn clear_saved(&mut self) {
+        unimplemented!()
+    }
+    #[inline]
+    fn get_saved(&mut self) -> &'de [u8] {
+        unimplemented!()
+    }
+    #[inline]
+    fn saved_is_empty(&self) -> bool {
+        unimplemented!()
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -442,6 +475,8 @@ impl<'a> SliceRead<'a> {
             index: 0,
             #[cfg(feature = "raw_value")]
             raw_buffering_start_index: 0,
+            save_start: 0,
+            save_end: 0,
         }
     }
 
@@ -585,8 +620,9 @@ impl<'a> Read<'a> for SliceRead<'a> {
     }
 
     #[inline]
-    fn str_from_scratch<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<&str> {
-        as_str(self, scratch)
+    fn str_from_saved(&mut self) -> Result<&str> {
+        let saved = self.get_saved();
+        as_str(self, saved)
     }
 
     #[inline]
@@ -671,6 +707,27 @@ impl<'a> Read<'a> for SliceRead<'a> {
     fn set_failed(&mut self, _failed: &mut bool) {
         self.slice = &self.slice[..self.index];
     }
+
+    #[inline]
+    fn save_start(&mut self) {
+        self.save_start = self.index;
+    }
+    #[inline]
+    fn save_end(&mut self) {
+        self.save_end = self.index;
+    }
+    #[inline]
+    fn clear_saved(&mut self) {
+        self.save_end = self.save_start;
+    }
+    #[inline]
+    fn get_saved(&mut self) -> &'a [u8] {
+        &self.slice[self.save_start..self.save_end]
+    }
+    #[inline]
+    fn saved_is_empty(&self) -> bool {
+        self.save_end == self.save_start
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -735,8 +792,8 @@ impl<'a> Read<'a> for StrRead<'a> {
     }
 
     #[inline]
-    fn str_from_scratch<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<&str> {
-        unsafe { Ok(str::from_utf8_unchecked(scratch)) }
+    fn str_from_saved(&mut self) -> Result<&str> {
+        unsafe { Ok(str::from_utf8_unchecked(self.get_saved())) }
     }
 
     fn parse_str<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<Reference<'a, 's, str>> {
@@ -788,6 +845,27 @@ impl<'a> Read<'a> for StrRead<'a> {
     #[cold]
     fn set_failed(&mut self, failed: &mut bool) {
         self.delegate.set_failed(failed);
+    }
+
+    #[inline]
+    fn save_start(&mut self) {
+        self.delegate.save_start()
+    }
+    #[inline]
+    fn save_end(&mut self) {
+        self.delegate.save_end()
+    }
+    #[inline]
+    fn clear_saved(&mut self) {
+        self.delegate.clear_saved()
+    }
+    #[inline]
+    fn get_saved(&mut self) -> &'a [u8] {
+        self.delegate.get_saved()
+    }
+    #[inline]
+    fn saved_is_empty(&self) -> bool {
+        self.delegate.saved_is_empty()
     }
 }
 
@@ -845,8 +923,8 @@ where
     }
 
     #[inline]
-    fn str_from_scratch<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<&str> {
-        R::str_from_scratch(self, scratch)
+    fn str_from_saved(&mut self) -> Result<&str> {
+        R::str_from_saved(self)
     }
 
     #[inline]
@@ -892,6 +970,27 @@ where
     #[inline]
     fn set_failed(&mut self, failed: &mut bool) {
         R::set_failed(self, failed);
+    }
+
+    #[inline]
+    fn save_start(&mut self) {
+        R::save_start(self)
+    }
+    #[inline]
+    fn save_end(&mut self) {
+        R::save_end(self)
+    }
+    #[inline]
+    fn clear_saved(&mut self) {
+        R::clear_saved(self)
+    }
+    #[inline]
+    fn get_saved(&mut self) -> &'de [u8] {
+        R::get_saved(self)
+    }
+    #[inline]
+    fn saved_is_empty(&self) -> bool {
+        R::saved_is_empty(self)
     }
 }
 

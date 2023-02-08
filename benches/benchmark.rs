@@ -140,7 +140,7 @@ fn bench_prost_deserialize(bench_group: &mut BenchmarkGroup<WallTime>, buf: &[u8
 
 fn bench_my_deserialize_des(bench_group: &mut BenchmarkGroup<WallTime>) {
     let ex = get_example();
-    let data = serde_encom::to_string(&ex).unwrap();;
+    let data = serde_encom::to_string(&ex).unwrap();
     bench_group.bench_with_input(BenchmarkId::new("deserialize", 1), data.as_bytes(), |b, val| {
         b.iter(|| serde_encom::from_slice::<A1>(val).unwrap())
     });
@@ -148,7 +148,7 @@ fn bench_my_deserialize_des(bench_group: &mut BenchmarkGroup<WallTime>) {
 
 fn bench_my_deserialize_value(bench_group: &mut BenchmarkGroup<WallTime>) {
     let ex = get_example();
-    let data = serde_encom::to_string(&ex).unwrap();;
+    let data = serde_encom::to_string(&ex).unwrap();
     bench_group.bench_with_input(BenchmarkId::new("deserialize value", 1), data.as_bytes(), |b, val| {
         b.iter(|| serde_encom::des::from_slice::<Value>(val).unwrap())
     });

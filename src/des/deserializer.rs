@@ -276,12 +276,6 @@ impl<'de, R: Read<'de>> Deserializer<R> {
     }
 
     #[inline]
-    fn save_char(&mut self, ch: u8) {
-        self.scratch.push(ch);
-        self.eat_char();
-    }
-
-    #[inline]
     fn next_char(&mut self) -> Result<Option<u8>> {
         self.read.next()
     }
@@ -350,17 +344,8 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         }
     } */
 
-    /// `deserialize_any()` what value is after b'{' or init
-    /// no validation of chars, because atoi_simd will do it, if it is numbers
-    pub(crate) fn any_after_x7b(&mut self) -> Result<PreParser> {
-        if let Some(ch) = self.parse_whitespace()? {
-            if ch == b'{' || ch == b'-' {
-                return Ok(PreParser::Seq);
-            }
-            self.save_char(ch);
-        } else {
-            return Err(self.error(ErrorCode::EofWhileParsingValue));
-        }
+    #[inline]
+    fn pre_parser_match(&mut self) -> Result<PreParser> {
         loop {
             match self.peek()? {
                 Some(b':') | Some(b'{') => {
@@ -373,11 +358,27 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                     return Ok(PreParser::ScratchSeq(ScratchState::ExponentNumber))
                 } */
                 Some(b'}') | Some(b' ') | Some(b'\n') | Some(b'\t') | Some(b'\r') | None => {
-                    return Ok(PreParser::ScratchSeq(ScratchState::Number))
+                    return Ok(PreParser::ScratchSeq(ScratchState::Number));
                 }
-                Some(ch) => self.save_char(ch),
+                _ => self.eat_char(),
             }
         }
+    }
+
+    /// `deserialize_any()` what value is after b'{' or init
+    /// no validation of chars, because atoi_simd will do it, if it is numbers
+    pub(crate) fn any_after_x7b(&mut self) -> Result<PreParser> {
+        if let Some(ch) = self.parse_whitespace()? {
+            if ch == b'{' || ch == b'-' {
+                return Ok(PreParser::Seq);
+            }
+            self.read.save_start();
+        } else {
+            return Err(self.error(ErrorCode::EofWhileParsingValue));
+        }
+        let ret = self.pre_parser_match();
+        self.read.save_end();
+        ret
     }
 
     /// checks end of string or bytes
@@ -1220,7 +1221,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
     }
 
     fn ignore_value(&mut self) -> Result<()> {
-        self.scratch.clear();
+        self.read.clear_saved();
         let mut enclosing = None;
 
         loop {
@@ -1276,8 +1277,8 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                 None => match enclosing.take() {
                     Some(frame) => (true, frame),
                     // None => match self.scratch.pop() {
-                        // Some(frame) => (true, frame),
-                        None => return Ok(()),
+                    // Some(frame) => (true, frame),
+                    None => return Ok(()),
                     // },
                 },
             };
@@ -1499,7 +1500,7 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for &'a mut Deserializer<R> {
             }
             _ => {
                 let ret = self.any_map_value(visitor);
-                self.scratch.clear();
+                self.read.clear_saved();
                 ret
             } // _ => Err(self.peek_error(ErrorCode::ExpectedSomeValue)),
         };
@@ -2027,7 +2028,7 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for &'a mut Deserializer<R> {
         };
 
         let value = {
-            self.scratch.clear();
+            self.read.clear_saved();
             match self.read.parse_str(&mut self.scratch)? {
                 Reference::Borrowed(s) => visitor.visit_borrowed_str(s),
                 Reference::Copied(s) => visitor.visit_str(s),
