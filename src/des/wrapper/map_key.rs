@@ -17,8 +17,8 @@ macro_rules! deserialize_integer_key {
             V: de::Visitor<'de>,
         {
             self.des.eat_char();
-            self.des.scratch.clear();
-            let string = self.des.read.parse_str(&mut self.des.scratch)?;
+            // self.des.scratch.clear();
+            let string = self.des.read.parse_str()?;
             match (string.parse(), string) {
                 (Ok(integer), _) => visitor.$visit(integer),
                 (Err(_), Reference::Borrowed(s)) => visitor.visit_borrowed_str(s),
@@ -40,8 +40,8 @@ where
         V: de::Visitor<'de>,
     {
         // self.des.eat_char();
-        self.des.scratch.clear();
-        match self.des.read.parse_str(&mut self.des.scratch)? {
+        // self.des.scratch.clear();
+        match self.des.read.parse_str()? {
             Reference::Borrowed(s) => visitor.visit_borrowed_str(s),
             Reference::Copied(s) => visitor.visit_str(s),
         }

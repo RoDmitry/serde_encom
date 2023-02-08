@@ -105,7 +105,6 @@ static POW10: [f64; 309] = [
 /// A structure that deserializes EnCom into Rust values.
 pub struct Deserializer<R> {
     pub(crate) read: R,
-    pub(crate) scratch: Vec<u8>,
     pub(crate) remaining_depth: u8,
     #[cfg(feature = "float_roundtrip")]
     single_precision: bool,
@@ -128,7 +127,6 @@ where
     pub fn new(read: R) -> Self {
         Deserializer {
             read,
-            scratch: Vec::with_capacity(32),
             remaining_depth: 128,
             #[cfg(feature = "float_roundtrip")]
             single_precision: false,
@@ -1263,9 +1261,9 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                     None
                 } */
                 frame @ b'{' => {
-                    if let Some(v) = enclosing.take() {
+                    /* if let Some(v) = enclosing.take() {
                         self.scratch.push(v);
-                    }
+                    } */
                     self.eat_char();
                     Some(frame)
                 }
@@ -1310,10 +1308,10 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                 }
 
                 self.eat_char();
-                frame = match self.scratch.pop() {
+                /* frame = match self.scratch.pop() {
                     Some(frame) => frame,
                     None => return Ok(()),
-                };
+                }; */
                 accept_comma = true;
             }
 
@@ -2029,7 +2027,7 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for &'a mut Deserializer<R> {
 
         let value = {
             self.read.clear_saved();
-            match self.read.parse_str(&mut self.scratch)? {
+            match self.read.parse_str()? {
                 Reference::Borrowed(s) => visitor.visit_borrowed_str(s),
                 Reference::Copied(s) => visitor.visit_str(s),
             }
