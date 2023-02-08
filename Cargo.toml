@@ -22,7 +22,7 @@ indexmap = { version = "1.5.2", features = ["std"], optional = true }
 itoa = "1"
 ryu = "1"
 flate2 = "1.0"
-atoi_simd = "0.7"
+atoi_simd = "0.8"
 
 [dev-dependencies]
 criterion = { version = "0.4", features = ["html_reports"] }

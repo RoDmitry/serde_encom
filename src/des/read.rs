@@ -3,7 +3,6 @@
 use crate::error::{Error, ErrorCode, Result};
 // use alloc::vec::Vec;
 // use core::char;
-use atoi_simd::parse_until_invalid_pos;
 use core::cmp;
 use core::ops::Deref;
 use core::str;
@@ -12,11 +11,11 @@ use core::str;
 use super::iter::LineColIterator;
 #[cfg(feature = "std")]
 use crate::io;
-
 #[cfg(feature = "raw_value")]
 use crate::raw::BorrowedRawDeserializer;
 #[cfg(all(feature = "raw_value", feature = "std"))]
 use crate::raw::OwnedRawDeserializer;
+use atoi_simd::parse_until_invalid;
 #[cfg(feature = "raw_value")]
 use serde::de::Visitor;
 
@@ -601,8 +600,8 @@ impl<'de> Read<'de> for SliceRead<'de> {
     }
 
     fn read_int_until_invalid(&mut self) -> Result<u64> {
-        let (res, i) = parse_until_invalid_pos(self.slice, self.index)?;
-        self.index = i;
+        let (res, i) = parse_until_invalid(&self.slice[self.index..])?;
+        self.index += i;
         Ok(res)
     }
 
