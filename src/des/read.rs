@@ -68,16 +68,13 @@ pub trait Read<'de>: private::Sealed {
 
     fn read_int_until_invalid(&mut self) -> Result<u64>;
 
-    fn str_from_scratch<'s>(&'s mut self, scratch: &'s mut Stack<u8, 32>) -> Result<&str>;
+    fn str_from_scratch<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<&str>;
 
     /// Assumes the previous byte was a quotation mark. Parses a EnCom-escaped
     /// string until the next quotation mark using the given scratch space if
     /// necessary. The scratch space is initially empty.
     #[doc(hidden)]
-    fn parse_str<'s>(
-        &'s mut self,
-        scratch: &'s mut Stack<u8, 32>,
-    ) -> Result<Reference<'de, 's, str>>;
+    fn parse_str<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<Reference<'de, 's, str>>;
 
     /// Assumes the previous byte was a quotation mark. Parses a EnCom-escaped
     /// string until the next quotation mark using the given scratch space if
@@ -88,7 +85,7 @@ pub trait Read<'de>: private::Sealed {
     #[doc(hidden)]
     fn parse_str_raw<'s>(
         &'s mut self,
-        scratch: &'s mut Stack<u8, 32>,
+        scratch: &'s mut Vec<u8>,
     ) -> Result<Reference<'de, 's, [u8]>>;
 
     /// Assumes the previous byte was a quotation mark. Parses a EnCom-escaped
@@ -224,7 +221,7 @@ where
 {
     fn parse_str_bytes<'s, T, F>(
         &'s mut self,
-        scratch: &'s mut Stack<u8, 32>,
+        scratch: &'s mut Vec<u8>,
         validate: bool,
         result: F,
     ) -> Result<T>
@@ -240,7 +237,7 @@ where
             }
             match ch {
                 b' ' | b'\n' | b'\t' | b'\r' => {
-                    return result(self, scratch.get_slice());
+                    return result(self, scratch);
                 }
                 /* b'\\' => {
                     parse_escape(self, validate, scratch)?;
@@ -354,15 +351,12 @@ where
     }
 
     #[inline]
-    fn str_from_scratch<'s>(&'s mut self, scratch: &'s mut Stack<u8, 32>) -> Result<&str> {
-        as_str(self, scratch.get_slice())
+    fn str_from_scratch<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<&str> {
+        as_str(self, scratch)
     }
 
     #[inline]
-    fn parse_str<'s>(
-        &'s mut self,
-        scratch: &'s mut Stack<u8, 32>,
-    ) -> Result<Reference<'de, 's, str>> {
+    fn parse_str<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<Reference<'de, 's, str>> {
         self.parse_str_bytes(scratch, true, as_str)
             .map(Reference::Copied)
     }
@@ -370,7 +364,7 @@ where
     #[inline]
     fn parse_str_raw<'s>(
         &'s mut self,
-        scratch: &'s mut Stack<u8, 32>,
+        scratch: &'s mut Vec<u8>,
     ) -> Result<Reference<'de, 's, [u8]>> {
         self.parse_str_bytes(scratch, false, |_, bytes| Ok(bytes))
             .map(Reference::Copied)
@@ -472,7 +466,7 @@ impl<'a> SliceRead<'a> {
     /// data so we avoid copying into the scratch space.
     fn parse_str_bytes<'s, T, F>(
         &'s mut self,
-        _scratch: &'s mut Stack<u8, 32>,
+        _scratch: &'s mut Vec<u8>,
         _validate: bool,
         result: F,
     ) -> Result<Reference<'a, 's, T>>
@@ -591,22 +585,19 @@ impl<'a> Read<'a> for SliceRead<'a> {
     }
 
     #[inline]
-    fn str_from_scratch<'s>(&'s mut self, scratch: &'s mut Stack<u8, 32>) -> Result<&str> {
-        as_str(self, scratch.get_slice())
+    fn str_from_scratch<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<&str> {
+        as_str(self, scratch)
     }
 
     #[inline]
-    fn parse_str<'s>(
-        &'s mut self,
-        scratch: &'s mut Stack<u8, 32>,
-    ) -> Result<Reference<'a, 's, str>> {
+    fn parse_str<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<Reference<'a, 's, str>> {
         self.parse_str_bytes(scratch, true, as_str)
     }
 
     #[inline]
     fn parse_str_raw<'s>(
         &'s mut self,
-        scratch: &'s mut Stack<u8, 32>,
+        scratch: &'s mut Vec<u8>,
     ) -> Result<Reference<'a, 's, [u8]>> {
         self.parse_str_bytes(scratch, false, |_, bytes| Ok(bytes))
     }
@@ -744,14 +735,11 @@ impl<'a> Read<'a> for StrRead<'a> {
     }
 
     #[inline]
-    fn str_from_scratch<'s>(&'s mut self, scratch: &'s mut Stack<u8, 32>) -> Result<&str> {
-        unsafe { Ok(str::from_utf8_unchecked(scratch.get_slice())) }
+    fn str_from_scratch<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<&str> {
+        unsafe { Ok(str::from_utf8_unchecked(scratch)) }
     }
 
-    fn parse_str<'s>(
-        &'s mut self,
-        scratch: &'s mut Stack<u8, 32>,
-    ) -> Result<Reference<'a, 's, str>> {
+    fn parse_str<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<Reference<'a, 's, str>> {
         self.delegate.parse_str_bytes(scratch, true, |_, bytes| {
             // The deserialization input came in as &str with a UTF-8 guarantee,
             // and the \u-escapes are checked along the way, so don't need to
@@ -762,7 +750,7 @@ impl<'a> Read<'a> for StrRead<'a> {
 
     fn parse_str_raw<'s>(
         &'s mut self,
-        scratch: &'s mut Stack<u8, 32>,
+        scratch: &'s mut Vec<u8>,
     ) -> Result<Reference<'a, 's, [u8]>> {
         self.delegate.parse_str_raw(scratch)
     }
@@ -857,22 +845,19 @@ where
     }
 
     #[inline]
-    fn str_from_scratch<'s>(&'s mut self, scratch: &'s mut Stack<u8, 32>) -> Result<&str> {
+    fn str_from_scratch<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<&str> {
         R::str_from_scratch(self, scratch)
     }
 
     #[inline]
-    fn parse_str<'s>(
-        &'s mut self,
-        scratch: &'s mut Stack<u8, 32>,
-    ) -> Result<Reference<'de, 's, str>> {
+    fn parse_str<'s>(&'s mut self, scratch: &'s mut Vec<u8>) -> Result<Reference<'de, 's, str>> {
         R::parse_str(self, scratch)
     }
 
     #[inline]
     fn parse_str_raw<'s>(
         &'s mut self,
-        scratch: &'s mut Stack<u8, 32>,
+        scratch: &'s mut Vec<u8>,
     ) -> Result<Reference<'de, 's, [u8]>> {
         R::parse_str_raw(self, scratch)
     }

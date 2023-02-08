@@ -24,7 +24,7 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for ScratchDeserializer<'a, '_
             return Err(self.des.peek_error(ErrorCode::EofWhileParsingList)); // todo: change err?
         }
 
-        let integer = parse(self.des.scratch.get_slice())?;
+        let integer = parse(&self.des.scratch)?;
         let ret = match self.state {
             ScratchState::Str => self.des.deserialize_str_by_index(visitor, integer as usize),
             ScratchState::Bytes => self

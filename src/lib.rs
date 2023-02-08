@@ -11,4 +11,5 @@ mod value;
 
 pub use des::*;
 pub use error::Error;
+pub use ser::*;
 pub use value::*;

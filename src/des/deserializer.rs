@@ -105,7 +105,7 @@ static POW10: [f64; 309] = [
 /// A structure that deserializes EnCom into Rust values.
 pub struct Deserializer<R> {
     pub(crate) read: R,
-    pub(crate) scratch: Stack<u8, 32>,
+    pub(crate) scratch: Vec<u8>,
     pub(crate) remaining_depth: u8,
     #[cfg(feature = "float_roundtrip")]
     single_precision: bool,
@@ -128,7 +128,7 @@ where
     pub fn new(read: R) -> Self {
         Deserializer {
             read,
-            scratch: Stack::new(),
+            scratch: Vec::with_capacity(32),
             remaining_depth: 128,
             #[cfg(feature = "float_roundtrip")]
             single_precision: false,
@@ -1275,10 +1275,10 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                 Some(frame) => (false, frame),
                 None => match enclosing.take() {
                     Some(frame) => (true, frame),
-                    None => match self.scratch.pop() {
-                        Some(frame) => (true, frame),
+                    // None => match self.scratch.pop() {
+                        // Some(frame) => (true, frame),
                         None => return Ok(()),
-                    },
+                    // },
                 },
             };
 
