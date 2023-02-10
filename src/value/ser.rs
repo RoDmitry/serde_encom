@@ -91,6 +91,7 @@ impl serde::Serializer for Serializer {
         self.serialize_i64(value as i64)
     }
 
+    #[inline]
     fn serialize_i64(self, value: i64) -> Result<Value> {
         Ok(Value::Number(value.into()))
     }
@@ -158,6 +159,7 @@ impl serde::Serializer for Serializer {
         Ok(Value::String(value.to_owned()))
     }
 
+    #[inline]
     fn serialize_bytes(self, value: &[u8]) -> Result<Value> {
         let vec = value.iter().map(|&b| Value::Number(b.into())).collect();
         Ok(Value::Array(vec))
@@ -219,16 +221,19 @@ impl serde::Serializer for Serializer {
         value.serialize(self)
     }
 
+    #[inline]
     fn serialize_seq(self, len: Option<usize>) -> Result<Self::SerializeSeq> {
         Ok(SerializeVec {
             vec: Vec::with_capacity(len.unwrap_or(0)),
         })
     }
 
+    #[inline]
     fn serialize_tuple(self, len: usize) -> Result<Self::SerializeTuple> {
         self.serialize_seq(Some(len))
     }
 
+    #[inline]
     fn serialize_tuple_struct(
         self,
         _name: &'static str,
@@ -237,6 +242,7 @@ impl serde::Serializer for Serializer {
         self.serialize_seq(Some(len))
     }
 
+    #[inline]
     fn serialize_tuple_variant(
         self,
         _name: &'static str,
@@ -250,6 +256,7 @@ impl serde::Serializer for Serializer {
         })
     }
 
+    #[inline]
     fn serialize_map(self, _len: Option<usize>) -> Result<Self::SerializeMap> {
         Ok(SerializeMap::Map {
             map: Map::new(),
@@ -257,6 +264,7 @@ impl serde::Serializer for Serializer {
         })
     }
 
+    #[inline]
     fn serialize_struct(self, name: &'static str, len: usize) -> Result<Self::SerializeStruct> {
         match name {
             #[cfg(feature = "arbitrary_precision")]
@@ -267,6 +275,7 @@ impl serde::Serializer for Serializer {
         }
     }
 
+    #[inline]
     fn serialize_struct_variant(
         self,
         _name: &'static str,
@@ -280,6 +289,7 @@ impl serde::Serializer for Serializer {
         })
     }
 
+    #[inline]
     fn collect_str<T>(self, value: &T) -> Result<Value>
     where
         T: ?Sized + Display,
@@ -317,6 +327,7 @@ impl serde::ser::SerializeSeq for SerializeVec {
     type Ok = Value;
     type Error = Error;
 
+    #[inline]
     fn serialize_element<T>(&mut self, value: &T) -> Result<()>
     where
         T: ?Sized + Serialize,
@@ -325,6 +336,7 @@ impl serde::ser::SerializeSeq for SerializeVec {
         Ok(())
     }
 
+    #[inline]
     fn end(self) -> Result<Value> {
         Ok(Value::Array(self.vec))
     }
@@ -334,6 +346,7 @@ impl serde::ser::SerializeTuple for SerializeVec {
     type Ok = Value;
     type Error = Error;
 
+    #[inline]
     fn serialize_element<T>(&mut self, value: &T) -> Result<()>
     where
         T: ?Sized + Serialize,
@@ -341,6 +354,7 @@ impl serde::ser::SerializeTuple for SerializeVec {
         serde::ser::SerializeSeq::serialize_element(self, value)
     }
 
+    #[inline]
     fn end(self) -> Result<Value> {
         serde::ser::SerializeSeq::end(self)
     }
@@ -350,6 +364,7 @@ impl serde::ser::SerializeTupleStruct for SerializeVec {
     type Ok = Value;
     type Error = Error;
 
+    #[inline]
     fn serialize_field<T>(&mut self, value: &T) -> Result<()>
     where
         T: ?Sized + Serialize,
@@ -357,6 +372,7 @@ impl serde::ser::SerializeTupleStruct for SerializeVec {
         serde::ser::SerializeSeq::serialize_element(self, value)
     }
 
+    #[inline]
     fn end(self) -> Result<Value> {
         serde::ser::SerializeSeq::end(self)
     }
@@ -366,6 +382,7 @@ impl serde::ser::SerializeTupleVariant for SerializeTupleVariant {
     type Ok = Value;
     type Error = Error;
 
+    #[inline]
     fn serialize_field<T>(&mut self, value: &T) -> Result<()>
     where
         T: ?Sized + Serialize,
@@ -387,6 +404,7 @@ impl serde::ser::SerializeMap for SerializeMap {
     type Ok = Value;
     type Error = Error;
 
+    #[inline]
     fn serialize_key<T>(&mut self, key: &T) -> Result<()>
     where
         T: ?Sized + Serialize,
@@ -403,6 +421,7 @@ impl serde::ser::SerializeMap for SerializeMap {
         }
     }
 
+    #[inline]
     fn serialize_value<T>(&mut self, value: &T) -> Result<()>
     where
         T: ?Sized + Serialize,
@@ -423,6 +442,7 @@ impl serde::ser::SerializeMap for SerializeMap {
         }
     }
 
+    #[inline]
     fn end(self) -> Result<Value> {
         match self {
             SerializeMap::Map { map, .. } => Ok(Value::Object(map)),
@@ -474,34 +494,42 @@ impl serde::Serializer for MapKeySerializer {
         Err(key_must_be_a_string())
     }
 
+    #[inline]
     fn serialize_i8(self, value: i8) -> Result<String> {
         Ok(value.to_string())
     }
 
+    #[inline]
     fn serialize_i16(self, value: i16) -> Result<String> {
         Ok(value.to_string())
     }
 
+    #[inline]
     fn serialize_i32(self, value: i32) -> Result<String> {
         Ok(value.to_string())
     }
 
+    #[inline]
     fn serialize_i64(self, value: i64) -> Result<String> {
         Ok(value.to_string())
     }
 
+    #[inline]
     fn serialize_u8(self, value: u8) -> Result<String> {
         Ok(value.to_string())
     }
 
+    #[inline]
     fn serialize_u16(self, value: u16) -> Result<String> {
         Ok(value.to_string())
     }
 
+    #[inline]
     fn serialize_u32(self, value: u32) -> Result<String> {
         Ok(value.to_string())
     }
 
+    #[inline]
     fn serialize_u64(self, value: u64) -> Result<String> {
         Ok(value.to_string())
     }
@@ -608,6 +636,7 @@ impl serde::Serializer for MapKeySerializer {
         Err(key_must_be_a_string())
     }
 
+    #[inline]
     fn collect_str<T>(self, value: &T) -> Result<String>
     where
         T: ?Sized + Display,
@@ -620,6 +649,7 @@ impl serde::ser::SerializeStruct for SerializeMap {
     type Ok = Value;
     type Error = Error;
 
+    #[inline]
     fn serialize_field<T>(&mut self, key: &'static str, value: &T) -> Result<()>
     where
         T: ?Sized + Serialize,
@@ -647,6 +677,7 @@ impl serde::ser::SerializeStruct for SerializeMap {
         }
     }
 
+    #[inline]
     fn end(self) -> Result<Value> {
         match self {
             SerializeMap::Map { .. } => serde::ser::SerializeMap::end(self),

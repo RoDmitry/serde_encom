@@ -175,6 +175,7 @@ impl<'de> Deserialize<'de> for Value {
 
 impl FromStr for Value {
     type Err = Error;
+
     fn from_str(s: &str) -> Result<Value, Error> {
         crate::from_str(s)
     }
@@ -361,6 +362,7 @@ impl<'de> serde::Deserializer<'de> for Value {
         }
     }
 
+    #[inline]
     fn deserialize_char<V>(self, visitor: V) -> Result<V::Value, Error>
     where
         V: Visitor<'de>,
@@ -368,6 +370,7 @@ impl<'de> serde::Deserializer<'de> for Value {
         self.deserialize_string(visitor)
     }
 
+    #[inline]
     fn deserialize_str<V>(self, visitor: V) -> Result<V::Value, Error>
     where
         V: Visitor<'de>,
@@ -386,6 +389,7 @@ impl<'de> serde::Deserializer<'de> for Value {
         }
     }
 
+    #[inline]
     fn deserialize_bytes<V>(self, visitor: V) -> Result<V::Value, Error>
     where
         V: Visitor<'de>,
@@ -415,6 +419,7 @@ impl<'de> serde::Deserializer<'de> for Value {
         }
     }
 
+    #[inline]
     fn deserialize_unit_struct<V>(self, _name: &'static str, visitor: V) -> Result<V::Value, Error>
     where
         V: Visitor<'de>,
@@ -432,6 +437,7 @@ impl<'de> serde::Deserializer<'de> for Value {
         }
     }
 
+    #[inline]
     fn deserialize_tuple<V>(self, _len: usize, visitor: V) -> Result<V::Value, Error>
     where
         V: Visitor<'de>,
@@ -439,6 +445,7 @@ impl<'de> serde::Deserializer<'de> for Value {
         self.deserialize_seq(visitor)
     }
 
+    #[inline]
     fn deserialize_tuple_struct<V>(
         self,
         _name: &'static str,
@@ -477,6 +484,7 @@ impl<'de> serde::Deserializer<'de> for Value {
         }
     }
 
+    #[inline]
     fn deserialize_identifier<V>(self, visitor: V) -> Result<V::Value, Error>
     where
         V: Visitor<'de>,
@@ -515,6 +523,7 @@ impl<'de> EnumAccess<'de> for EnumDeserializer {
 impl<'de> IntoDeserializer<'de, Error> for Value {
     type Deserializer = Self;
 
+    #[inline]
     fn into_deserializer(self) -> Self::Deserializer {
         self
     }
@@ -853,6 +862,7 @@ impl<'de> serde::Deserializer<'de> for &'de Value {
         }
     }
 
+    #[inline]
     fn deserialize_char<V>(self, visitor: V) -> Result<V::Value, Error>
     where
         V: Visitor<'de>,
@@ -870,6 +880,7 @@ impl<'de> serde::Deserializer<'de> for &'de Value {
         }
     }
 
+    #[inline]
     fn deserialize_string<V>(self, visitor: V) -> Result<V::Value, Error>
     where
         V: Visitor<'de>,
@@ -888,6 +899,7 @@ impl<'de> serde::Deserializer<'de> for &'de Value {
         }
     }
 
+    #[inline]
     fn deserialize_byte_buf<V>(self, visitor: V) -> Result<V::Value, Error>
     where
         V: Visitor<'de>,
@@ -905,6 +917,7 @@ impl<'de> serde::Deserializer<'de> for &'de Value {
         }
     }
 
+    #[inline]
     fn deserialize_unit_struct<V>(self, _name: &'static str, visitor: V) -> Result<V::Value, Error>
     where
         V: Visitor<'de>,
@@ -922,6 +935,7 @@ impl<'de> serde::Deserializer<'de> for &'de Value {
         }
     }
 
+    #[inline]
     fn deserialize_tuple<V>(self, _len: usize, visitor: V) -> Result<V::Value, Error>
     where
         V: Visitor<'de>,
@@ -929,6 +943,7 @@ impl<'de> serde::Deserializer<'de> for &'de Value {
         self.deserialize_seq(visitor)
     }
 
+    #[inline]
     fn deserialize_tuple_struct<V>(
         self,
         _name: &'static str,
@@ -967,6 +982,7 @@ impl<'de> serde::Deserializer<'de> for &'de Value {
         }
     }
 
+    #[inline]
     fn deserialize_identifier<V>(self, visitor: V) -> Result<V::Value, Error>
     where
         V: Visitor<'de>,
@@ -1250,6 +1266,7 @@ enum KeyClass {
 impl<'de> DeserializeSeed<'de> for KeyClassifier {
     type Value = KeyClass;
 
+    #[inline]
     fn deserialize<D>(self, deserializer: D) -> Result<Self::Value, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1265,6 +1282,7 @@ impl<'de> Visitor<'de> for KeyClassifier {
         formatter.write_str("a string key")
     }
 
+    #[inline]
     fn visit_str<E>(self, s: &str) -> Result<Self::Value, E>
     where
         E: de::Error,
@@ -1279,6 +1297,7 @@ impl<'de> Visitor<'de> for KeyClassifier {
     }
 
     #[cfg(any(feature = "std", feature = "alloc"))]
+    #[inline]
     fn visit_string<E>(self, s: String) -> Result<Self::Value, E>
     where
         E: de::Error,
@@ -1377,6 +1396,7 @@ struct UnitOnly;
 impl<'de> de::VariantAccess<'de> for UnitOnly {
     type Error = Error;
 
+    #[inline]
     fn unit_variant(self) -> Result<(), Error> {
         Ok(())
     }
