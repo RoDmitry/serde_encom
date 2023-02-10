@@ -325,12 +325,13 @@ impl From<AtoiSimdError<'_>> for ErrorCode {
     fn from(e: AtoiSimdError) -> Self {
         match e {
             AtoiSimdError::Empty => ErrorCode::EofWhileParsingValue,
-            AtoiSimdError::Size(_, _) => ErrorCode::NumberOutOfRange,
-            AtoiSimdError::Overflow(_, _) => ErrorCode::NumberOutOfRange,
+            AtoiSimdError::Size(_, _) => ErrorCode::NumberOutOfRange, //todo: new error
+            AtoiSimdError::Overflow64(_, _) | AtoiSimdError::Overflow128(_, _) => {
+                ErrorCode::NumberOutOfRange
+            }
             AtoiSimdError::Invalid64(_, _) | AtoiSimdError::Invalid128(_, _) => {
                 ErrorCode::InvalidNumber
             }
-            AtoiSimdError::I64Min => unreachable!(),
         }
     }
 }
