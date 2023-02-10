@@ -1,6 +1,6 @@
 [package]
 name = "serde_encom"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Dmitry Rodionov <18184039+RoDmitry@users.noreply.github.com>"]
 description = "Official EnCom Rust library"
 repository = "https://github.com/RoDmitry/serde_encom"
@@ -34,7 +34,7 @@ serde_bytes = "0.11"
 name = "benchmark"
 harness = false
 
-### FEATURES #################################################################
+############################## FEATURES ######################################
 
 [features]
 default = ["std"]
