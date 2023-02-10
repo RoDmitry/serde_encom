@@ -10,6 +10,6 @@ mod test;
 mod value;
 
 pub use des::*;
-pub use error::Error;
+pub use error::*;
 pub use ser::*;
 pub use value::*;

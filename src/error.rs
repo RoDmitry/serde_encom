@@ -45,18 +45,18 @@ impl Error {
 
     /// Categorizes the cause of this error.
     ///
-    /// - `Category::Io` - failure to read or write bytes on an IO stream
-    /// - `Category::Syntax` - input that is not syntactically valid EnCom
-    /// - `Category::Data` - input data that is semantically incorrect
-    /// - `Category::Eof` - unexpected end of the input data
-    pub fn classify(&self) -> Category {
+    /// - `ErrorCategory::Io` - failure to read or write bytes on an IO stream
+    /// - `ErrorCategory::Syntax` - input that is not syntactically valid EnCom
+    /// - `ErrorCategory::Data` - input data that is semantically incorrect
+    /// - `ErrorCategory::Eof` - unexpected end of the input data
+    pub fn classify(&self) -> ErrorCategory {
         match self.err.code {
-            ErrorCode::Message(_) => Category::Data,
-            ErrorCode::Io(_) => Category::Io,
+            ErrorCode::Message(_) => ErrorCategory::Data,
+            ErrorCode::Io(_) => ErrorCategory::Io,
             ErrorCode::EofWhileParsingList
             | ErrorCode::EofWhileParsingObject
             | ErrorCode::EofWhileParsingString
-            | ErrorCode::EofWhileParsingValue => Category::Eof,
+            | ErrorCode::EofWhileParsingValue => ErrorCategory::Eof,
             ErrorCode::ExpectedColon
             | ErrorCode::ExpectedListCommaOrEnd
             | ErrorCode::ExpectedObjectCommaOrEnd
@@ -73,20 +73,20 @@ impl Error {
             | ErrorCode::TrailingCharacters
             | ErrorCode::UnexpectedEndOfHexEscape
             | ErrorCode::UnexpectedEndOfString
-            | ErrorCode::RecursionLimitExceeded => Category::Syntax,
+            | ErrorCode::RecursionLimitExceeded => ErrorCategory::Syntax,
         }
     }
 
     /// Returns true if this error was caused by a failure to read or write
     /// bytes on an IO stream.
     pub fn is_io(&self) -> bool {
-        self.classify() == Category::Io
+        self.classify() == ErrorCategory::Io
     }
 
     /// Returns true if this error was caused by input that was not
     /// syntactically valid EnCom.
     pub fn is_syntax(&self) -> bool {
-        self.classify() == Category::Syntax
+        self.classify() == ErrorCategory::Syntax
     }
 
     /// Returns true if this error was caused by input data that was
@@ -95,7 +95,7 @@ impl Error {
     /// For example, EnCom containing a number is semantically incorrect when the
     /// type being deserialized into holds a String.
     pub fn is_data(&self) -> bool {
-        self.classify() == Category::Data
+        self.classify() == ErrorCategory::Data
     }
 
     /// Returns true if this error was caused by prematurely reaching the end of
@@ -104,13 +104,13 @@ impl Error {
     /// Callers that process streaming input may be interested in retrying the
     /// deserialization once more data is available.
     pub fn is_eof(&self) -> bool {
-        self.classify() == Category::Eof
+        self.classify() == ErrorCategory::Eof
     }
 }
 
 /// Categorizes the cause of a `serde_encom::Error`.
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
-pub enum Category {
+pub enum ErrorCategory {
     /// The error was caused by a failure to read or write bytes on an IO
     /// stream.
     Io,
@@ -149,12 +149,12 @@ impl From<Error> for io::Error {
     ///
     /// impl From<serde_encom::Error> for MyError {
     ///     fn from(err: serde_encom::Error) -> MyError {
-    ///         use serde_encom::error::Category;
+    ///         use serde_encom::ErrorCategory;
     ///         match err.classify() {
-    ///             Category::Io => {
+    ///             ErrorCategory::Io => {
     ///                 MyError::Io(err.into())
     ///             }
-    ///             Category::Syntax | Category::Data | Category::Eof => {
+    ///             ErrorCategory::Syntax | ErrorCategory::Data | ErrorCategory::Eof => {
     ///                 MyError::EnCom(err)
     ///             }
     ///         }
@@ -166,9 +166,11 @@ impl From<Error> for io::Error {
             err
         } else {
             match j.classify() {
-                Category::Io => unreachable!(),
-                Category::Syntax | Category::Data => io::Error::new(io::ErrorKind::InvalidData, j),
-                Category::Eof => io::Error::new(io::ErrorKind::UnexpectedEof, j),
+                ErrorCategory::Io => unreachable!(),
+                ErrorCategory::Syntax | ErrorCategory::Data => {
+                    io::Error::new(io::ErrorKind::InvalidData, j)
+                }
+                ErrorCategory::Eof => io::Error::new(io::ErrorKind::UnexpectedEof, j),
             }
         }
     }
