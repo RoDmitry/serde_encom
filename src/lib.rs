@@ -1,12 +1,12 @@
 extern crate alloc;
 
-pub mod des;
-pub mod error;
+mod des;
+mod error;
 mod io;
 mod macros;
-pub mod ser;
+mod ser;
 #[cfg(test)]
-pub mod test;
+mod test;
 mod value;
 
 pub use des::*;

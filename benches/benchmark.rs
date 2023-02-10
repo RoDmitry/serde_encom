@@ -154,7 +154,7 @@ fn bench_my_deserialize_value(bench_group: &mut BenchmarkGroup<WallTime>) {
     bench_group.bench_with_input(
         BenchmarkId::new("deserialize value", 1),
         data.as_bytes(),
-        |b, val| b.iter(|| serde_encom::des::from_slice::<Value>(val).unwrap()),
+        |b, val| b.iter(|| serde_encom::from_slice::<Value>(val).unwrap()),
     );
 }
 
