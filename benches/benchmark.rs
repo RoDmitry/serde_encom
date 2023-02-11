@@ -10,33 +10,40 @@ fn get_example() -> ExType {
     A1 {
         a1: 3,
         a2: "asd".to_owned(),
-        a3: vec!["gds".to_owned(), "tmuj".to_owned()],
-        a4: vec![245, 45],
+        a3: vec![
+            "ggsd gghdfjfhg hjgfj dgfhdghgd sdds".to_owned(),
+            "tmsfgsdg hdgsdguj".to_owned(),
+        ],
+        a4: vec![256786586457545, 45658456788658],
         a5: A2 {
-            a1: 21,
+            a1: 2568658745675781,
             a2: "df".to_owned(),
         },
         a6: vec![
             A2 {
-                a1: 65,
+                a1: 6588574567765765,
                 a2: "ku".to_owned(),
             },
             A2 {
-                a1: 87,
+                a1: 84563573577,
                 a2: "h🔥ty".to_owned(),
             },
         ],
         a8: vec![
-            E1::U64(7),
-            E1::Vecu64(vec![2, 5, 7]),
-            E1::U64(9),
-            E1::VecStr(vec!["aasd".to_owned(), "gg".to_owned(), "lk".to_owned()]),
+            E1::U64(785723452385678),
+            E1::Vecu64(vec![578562358658562, 5785566546787585, 869668956674787]),
+            E1::U64(7586587584565789),
+            E1::VecStr(vec![
+                "aasd fhgdgdgd".to_owned(),
+                "dfyfy dfygg".to_owned(),
+                "lkhdf hfdhdf".to_owned(),
+            ]),
         ],
-        a7: E1::U64(3),
+        a7: E1::U64(53653467733),
         a13: Some("fash".to_owned()),
         a14: Some(E1::String("dgasdfgh".to_owned())),
-        a15: [1, 3, 6, 8],
-        a16: [E1::U64(4), E1::U64(6), E1::U64(3), E1::U64(2)],
+        a15: [152552464262, 3758566658, 656568474657, 856787596896],
+        a16: [E1::U64(4647), E1::U64(6645846), E1::U64(3457), E1::U64(2647)],
     }
 }
 
@@ -231,8 +238,8 @@ fn benchmark(c: &mut Criterion) {
         let data = serde_encom::ser::to_string(&example).unwrap();
         bench_my_deserialize4(&mut bench_group, data.as_bytes()); */
 
-        // bench_my_deserialize_des(&mut bench_group);
-        bench_my_deserialize_value(&mut bench_group);
+        bench_my_deserialize_des(&mut bench_group);
+        // bench_my_deserialize_value(&mut bench_group);
 
         /* bench_group.bench_with_input(BenchmarkId::new("atoi", 1), "123456789012345", |b, val| {
             b.iter(|| parse_u64(val, None).unwrap())

@@ -15,7 +15,7 @@ use crate::io;
 use crate::raw::BorrowedRawDeserializer;
 #[cfg(all(feature = "raw_value", feature = "std"))]
 use crate::raw::OwnedRawDeserializer;
-use atoi_simd::parse_until_invalid;
+use atoi_simd::parse_until_invalid_pos;
 #[cfg(feature = "raw_value")]
 use serde::de::Visitor;
 
@@ -64,7 +64,7 @@ pub trait Read<'de>: private::Sealed {
 
     fn read_slice<'s>(&'s mut self, len: usize) -> Result<&'de [u8]>;
 
-    fn read_int_until_invalid(&mut self) -> Result<u64>;
+    fn read_int_until_invalid_pos(&mut self) -> Result<u64>;
 
     fn str_from_saved(&mut self) -> Result<&'de str>;
 
@@ -348,7 +348,7 @@ where
     }
 
     #[inline]
-    fn read_int_until_invalid(&mut self) -> Result<u64> {
+    fn read_int_until_invalid_pos(&mut self) -> Result<u64> {
         unimplemented!()
     }
 
@@ -599,8 +599,9 @@ impl<'de> Read<'de> for SliceRead<'de> {
         Ok(&self.slice[start..self.index])
     }
 
-    fn read_int_until_invalid(&mut self) -> Result<u64> {
-        let (res, i) = parse_until_invalid(&self.slice[self.index..])?;
+    #[inline]
+    fn read_int_until_invalid_pos(&mut self) -> Result<u64> {
+        let (res, i) = parse_until_invalid_pos(&self.slice[self.index..])?;
         self.index += i;
         Ok(res)
     }
@@ -770,8 +771,8 @@ impl<'de> Read<'de> for StrRead<'de> {
     }
 
     #[inline]
-    fn read_int_until_invalid(&mut self) -> Result<u64> {
-        self.delegate.read_int_until_invalid()
+    fn read_int_until_invalid_pos(&mut self) -> Result<u64> {
+        self.delegate.read_int_until_invalid_pos()
     }
 
     #[inline]
@@ -899,8 +900,8 @@ where
     }
 
     #[inline]
-    fn read_int_until_invalid(&mut self) -> Result<u64> {
-        R::read_int_until_invalid(self)
+    fn read_int_until_invalid_pos(&mut self) -> Result<u64> {
+        R::read_int_until_invalid_pos(self)
     }
 
     #[inline]
