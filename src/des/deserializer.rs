@@ -337,7 +337,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
     /// no validation of chars, because atoi_simd will do it, if it is numbers
     pub(crate) fn any_after_x7b(&mut self) -> Result<PreParser> {
         if let Some(ch) = self.parse_whitespace()? {
-            if ch == b'{' || ch == b'-' {
+            if ch == b'{' || ch == b'-' || ch == b't' || ch == b'f' {
                 return Ok(PreParser::Seq);
             }
             self.read.save_start();
@@ -412,20 +412,20 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                 } */
                 de::Error::invalid_type(Unexpected::Unit, exp)
             }
-            /* b't' => {
+            b't' => {
                 self.eat_char();
-                if let Err(err) = self.parse_ident(b"rue") {
+                /* if let Err(err) = self.parse_ident(b"rue") {
                     return err;
-                }
+                } */
                 de::Error::invalid_type(Unexpected::Bool(true), exp)
             }
             b'f' => {
                 self.eat_char();
-                if let Err(err) = self.parse_ident(b"alse") {
+                /* if let Err(err) = self.parse_ident(b"alse") {
                     return err;
-                }
+                } */
                 de::Error::invalid_type(Unexpected::Bool(false), exp)
-            } */
+            }
             b'-' => {
                 self.eat_char();
                 match self.parse_any_number(false) {
@@ -1220,16 +1220,16 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                     // self.parse_ident(b"ull")?;
                     None
                 }
-                /* b't' => {
+                b't' => {
                     self.eat_char();
-                    self.parse_ident(b"rue")?;
+                    // self.parse_ident(b"rue")?;
                     None
                 }
                 b'f' => {
                     self.eat_char();
-                    self.parse_ident(b"alse")?;
+                    // self.parse_ident(b"alse")?;
                     None
-                } */
+                }
                 b'-' => {
                     self.eat_char();
                     self.ignore_integer()?;
@@ -1417,16 +1417,16 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for &'a mut Deserializer<R> {
                 // self.parse_ident(b"ull")?;
                 visitor.visit_unit()
             }
-            /* b't' => {
+            b't' => {
                 self.eat_char();
-                self.parse_ident(b"rue")?;
+                // self.parse_ident(b"rue")?;
                 visitor.visit_bool(true)
             }
             b'f' => {
                 self.eat_char();
-                self.parse_ident(b"alse")?;
+                // self.parse_ident(b"alse")?;
                 visitor.visit_bool(false)
-            } */
+            }
             b'-' => {
                 self.eat_char();
                 self.parse_any_number(false)?.visit(visitor)
@@ -1500,12 +1500,12 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for &'a mut Deserializer<R> {
         };
 
         let value = match peek {
-            b'1' => {
+            b't' => {
                 self.eat_char();
                 // self.parse_ident(b"rue")?;
                 visitor.visit_bool(true)
             }
-            b'0' => {
+            b'f' => {
                 self.eat_char();
                 // self.parse_ident(b"alse")?;
                 visitor.visit_bool(false)

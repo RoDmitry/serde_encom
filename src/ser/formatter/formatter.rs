@@ -18,7 +18,7 @@ pub(crate) trait Formatter {
     where
         W: ?Sized + io::Write,
     {
-        writer.write_all(if value { b"1" } else { b"0" })
+        writer.write_all(if value { b"t" } else { b"f" })
     }
 
     /// Writes an integer value like `-123` to the specified writer.
