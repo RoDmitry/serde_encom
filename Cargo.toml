@@ -1,8 +1,8 @@
 [package]
 name = "serde_encom"
 version = "0.2.0"
-authors = ["Dmitry Rodionov <18184039+RoDmitry@users.noreply.github.com>"]
-description = "Official EnCom Rust library"
+authors = ["Dmitry Rodionov <gh@rodmitry.com>"]
+description = "Official EnCom library"
 repository = "https://github.com/RoDmitry/serde_encom"
 homepage = "https://github.com/RoDmitry/serde_encom"
 readme = "README.md"
