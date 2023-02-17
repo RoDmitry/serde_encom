@@ -16,7 +16,6 @@ name = "serde_encom"
 path = "src/lib.rs"
 
 [dependencies]
-#stack = { workspace = true }
 serde = { version = "1.0", features = ["derive"] }
 indexmap = { version = "1.5.2", features = ["std"], optional = true }
 itoa = "1"

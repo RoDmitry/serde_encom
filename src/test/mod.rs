@@ -9,6 +9,43 @@ mod vec_int;
 mod vec_option_int;
 mod vec_str;
 
+#[test]
+fn example_json() {
+    let v = encom_from_json!({
+        "admins": [
+            {
+                "adminGroupID": 1,
+                "adminName": "admin",
+                "balance": 10.4,
+                "folder": "main",
+                "number": 2
+            },
+            {
+                "adminGroupID": 4,
+                "adminName": "",
+                "balance": -2.3,
+                "folder": "other",
+                "number": 5
+            }
+        ],
+        "cacheFolder": null,
+        "isGood": true,
+        "mapping": {
+            "files": "/static/*",
+            "tools": "/tools/*"
+        },
+        "useJSON": false
+    });
+
+    println!("{v:#}");
+}
+
+#[test]
+fn example_json_compact() {
+    let v = encom_from_json!({"1": [{"1": 1, "2": "admin", "3": 10.4, "4": "main", "5": 2}, {"1": 4, "2": "", "3": -2.3, "4": "other", "5": 5}], "2": null, "3": true, "4": {"1": "/static/*", "2": "/tools/*"}, "5": false});
+    println!("{v}");
+}
+
 /* use crate::InitDeserializer;
 #[test]
 fn stream() {
@@ -30,56 +67,3 @@ fn stream() {
     // If err.is_eof(), can join the remaining data to new data and continue.
     let remaining = &data[stream.byte_offset()..];
 } */
-
-#[test]
-fn big_json() {
-    let v = encom_from_json!({
-        "web-app": {
-            "servlet": [
-                {
-                    "init-param": {
-                        "adminGroupID": 4,
-                        "betaServer": true,
-                        "dataLog": 1,
-                        "dataLogMaxSize": "",
-                        "fileTransferFolder": "fileTransferFolder",
-                        "log": 1
-                    },
-                    "servlet-name": "cofaxTools"
-                },
-                {
-                    "init-param": {
-                        "cacheTemplatesStore": null,
-                        "cacheTemplatesTrack": 100,
-                        "configGlossary-poweredBy": "Cofax",
-                        "dataStoreMaxConns": 100,
-                        "dataStoreName": "cofax",
-                        "maxUrlLength": 500,
-                        "templateOverridePath": "",
-                        "templatePath": "templates",
-                        "useDataStore": true,
-                        "useJSP": false
-                    },
-                    "servlet-class": "org.cofax.cds.CDSServlet",
-                    "servlet-name": "cofaxCDS"
-                },
-                {
-                    "init-param": {
-                        "mailHost": "mail1",
-                        "mailHostOverride": "mail2"
-                    },
-                    "servlet-name": "cofaxEmail"
-                },
-            ],
-            "servlet-mapping": {
-                "cofaxTools": "/tools/*",
-                "fileServlet": "/static/*"
-            },
-            "taglib": {
-                "taglib-location": "/WEB-INF/tlds/cofax.tld"
-            }
-        }
-    });
-
-    println!("{v:#}");
-}
