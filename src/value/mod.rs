@@ -910,7 +910,7 @@ mod ser;
 ///     location: String,
 /// }
 ///
-/// fn compare_encom_values() -> Result<(), Box<Error>> {
+/// fn compare_encom_values() -> Result<(), Box<dyn Error>> {
 ///     let u = User {
 ///         fingerprint: "0xF9BA143B95FF6D82".to_owned(),
 ///         location: "Menlo Park, CA".to_owned(),
