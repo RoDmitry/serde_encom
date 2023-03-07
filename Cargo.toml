@@ -9,7 +9,7 @@ readme = "README.md"
 keywords = ["encom", "serde", "serialization", "json"]
 categories = ["encoding", "parser-implementations"]
 license = "MIT OR Apache-2.0"
-edition = "2018"
+edition = "2021"
 
 [lib]
 name = "serde_encom"
@@ -22,7 +22,7 @@ itoa = "1"
 ryu = "1"
 flate2 = "1.0"
 # atoi_simd = { git = "https://github.com/RoDmitry/atoi_simd" }
-atoi_simd = "0.10"
+atoi_simd = "0.11"
 
 [dev-dependencies]
 criterion = { version = "0.4", features = ["html_reports"] }

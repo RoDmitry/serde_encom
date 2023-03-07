@@ -328,10 +328,7 @@ impl From<AtoiSimdError<'_>> for ErrorCode {
         match e {
             AtoiSimdError::Empty => ErrorCode::EofWhileParsingValue,
             AtoiSimdError::Size(_, _) => ErrorCode::NumberOutOfRange, //todo: new error
-            AtoiSimdError::Overflow64(_, _)
-            | AtoiSimdError::Overflow64Neg(_, _)
-            | AtoiSimdError::Overflow128(_, _)
-            | AtoiSimdError::Overflow128Neg(_, _) => ErrorCode::NumberOutOfRange,
+            AtoiSimdError::Overflow(_, _) => ErrorCode::NumberOutOfRange,
             AtoiSimdError::Invalid64(_, _) | AtoiSimdError::Invalid128(_, _) => {
                 ErrorCode::InvalidNumber
             }
@@ -355,7 +352,7 @@ impl serde::de::StdError for Error {
     #[cfg(feature = "std")]
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         match &self.err.code {
-            ErrorCode::Io(err) => Some(err),
+            ErrorCode::Io(err) => err.source(),
             _ => None,
         }
     }
