@@ -21,8 +21,8 @@ indexmap = { version = "1.5.2", features = ["std"], optional = true }
 itoa = "1"
 ryu = "1"
 flate2 = "1.0"
-# atoi_simd = { git = "https://github.com/RoDmitry/atoi_simd" }
-atoi_simd = "0.11"
+# atoi_simd = { git = "https://github.com/RoDmitry/atoi_simd", branch = "fb" }
+atoi_simd = "0.12"
 
 [dev-dependencies]
 criterion = { version = "0.4", features = ["html_reports"] }

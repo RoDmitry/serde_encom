@@ -329,7 +329,7 @@ impl From<AtoiSimdError<'_>> for ErrorCode {
             AtoiSimdError::Empty => ErrorCode::EofWhileParsingValue,
             AtoiSimdError::Size(_, _) => ErrorCode::NumberOutOfRange, //todo: new error
             AtoiSimdError::Overflow(_, _) => ErrorCode::NumberOutOfRange,
-            AtoiSimdError::Invalid64(_, _) | AtoiSimdError::Invalid128(_, _) => {
+            AtoiSimdError::Invalid64(_, _, _) | AtoiSimdError::Invalid128(_, _, _) => {
                 ErrorCode::InvalidNumber
             }
         }
