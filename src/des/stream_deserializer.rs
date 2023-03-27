@@ -3,8 +3,8 @@ use super::read::Fused;
 use super::read::Read;
 use crate::error::{Error, ErrorCode, Result};
 use core::iter::FusedIterator;
+use core::marker::PhantomData;
 use serde::de;
-use std::marker::PhantomData;
 
 /// Iterator that deserializes a stream into multiple EnCom values.
 ///

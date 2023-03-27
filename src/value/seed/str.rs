@@ -1,6 +1,6 @@
 use crate::{Value, ValueVisitor};
+use core::result::Result;
 use serde::de::DeserializeSeed;
-use std::result::Result;
 
 pub(crate) struct StrSeed;
 

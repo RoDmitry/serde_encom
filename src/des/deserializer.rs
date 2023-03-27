@@ -1,5 +1,7 @@
 use super::access::{MapAccess, SavedMapAccess, SavedSeqAccess, SeqAccess, VariantAccess};
-use super::read::{IoRead, Read, Reference, SliceRead, StrRead};
+#[cfg(feature = "std")]
+use super::read::IoRead;
+use super::read::{Read, Reference, SliceRead, StrRead};
 use super::{parser_number::ParserNumber, stream_deserializer::StreamDeserializer};
 use crate::error::{Error, ErrorCode, Result};
 #[cfg(feature = "float_roundtrip")]

@@ -38,7 +38,7 @@ harness = false
 [features]
 default = ["std"]
 
-std = ["serde/std"]
+std = ["serde/std", "atoi_simd/std"]
 
 # Provide integration for heap-allocated collections without depending on the
 # rest of the Rust standard library.

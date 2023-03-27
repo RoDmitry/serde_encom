@@ -6,6 +6,7 @@ fn test_data() {
     let v: Value = crate::from_str(data).unwrap();
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
+    #[cfg(feature = "std")]
     println!("{v}");
     let res = encom_from_json!({
         "3": {
@@ -30,6 +31,7 @@ fn test_data2() {
     let v: Value = crate::from_str(data).unwrap();
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
+    #[cfg(feature = "std")]
     println!("{v}");
     let res = encom_from_json!({
         "name": "John Doe",
@@ -49,6 +51,7 @@ fn test_str() {
     let v: Value = crate::from_str(data).unwrap();
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
+    #[cfg(feature = "std")]
     println!("{v}");
     let res = encom_from_json!({"name": "John Doe"});
     assert_eq!(v, res);
@@ -61,6 +64,7 @@ fn test_zero_str() {
     let v: Value = crate::from_str(data).unwrap();
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
+    #[cfg(feature = "std")]
     println!("{v}");
     let res = encom_from_json!({"str": ""});
     assert_eq!(v, res);
@@ -73,6 +77,7 @@ fn test_zero_str2() {
     let v: Value = crate::from_str(data).unwrap();
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
+    #[cfg(feature = "std")]
     println!("{v}");
     let res = encom_from_json!({"str": "", "str2": ""});
     assert_eq!(v, res);
@@ -85,6 +90,7 @@ fn test_map() {
     let v: Value = crate::from_str(data).unwrap();
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
+    #[cfg(feature = "std")]
     println!("{v}");
     let res = encom_from_json!({"a": 8});
     assert_eq!(v, res);
@@ -97,6 +103,7 @@ fn test_null() {
     let v: Value = crate::from_str(data).unwrap();
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
+    #[cfg(feature = "std")]
     println!("{v}");
     let res = encom_from_json!({ "a": null });
     assert_eq!(v, res);
@@ -109,6 +116,7 @@ fn test_null2() {
     let v: Value = crate::from_str(data).unwrap();
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
+    #[cfg(feature = "std")]
     println!("{v}");
     let res = encom_from_json!({ "a": null, "b": null });
     assert_eq!(v, res);
@@ -121,6 +129,7 @@ fn test_number_neg() {
     let v: Value = crate::from_str(data).unwrap();
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
+    #[cfg(feature = "std")]
     println!("{v}");
     let res = encom_from_json!({ "a": -15 });
     assert_eq!(v, res);
@@ -133,6 +142,7 @@ fn test_number_float() {
     let v: Value = crate::from_str(data).unwrap();
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
+    #[cfg(feature = "std")]
     println!("{v}");
     let res = encom_from_json!({ "a": 1.5 });
     assert_eq!(v, res);
@@ -145,6 +155,7 @@ fn test_number_neg_float() {
     let v: Value = crate::from_str(data).unwrap();
     let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
 
+    #[cfg(feature = "std")]
     println!("{v}");
     let res = encom_from_json!({ "a": -1.5 });
     assert_eq!(v, res);

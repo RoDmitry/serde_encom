@@ -6,7 +6,49 @@ use serde::{Deserialize, Serialize};
 use serde_encom::Value;
 
 type ExType = A1;
-fn get_example() -> ExType {
+
+fn get_example_shortnum() -> ExType {
+    A1 {
+        a1: 3,
+        a2: "asd".to_owned(),
+        a3: vec![
+            "ggsd gghdfjfhg hjgfj dgfhdghgd sdds".to_owned(),
+            "tmsfgsdg hdgsdguj".to_owned(),
+        ],
+        a4: vec![1, 2],
+        a5: A2 {
+            a1: 1,
+            a2: "df".to_owned(),
+        },
+        a6: vec![
+            A2 {
+                a1: 3,
+                a2: "ku".to_owned(),
+            },
+            A2 {
+                a1: 5,
+                a2: "h🔥ty".to_owned(),
+            },
+        ],
+        a8: vec![
+            E1::U64(7),
+            E1::Vecu64(vec![3, 7, 9]),
+            E1::U64(8),
+            E1::VecStr(vec![
+                "aasd fhgdgdgd".to_owned(),
+                "dfyfy dfygg".to_owned(),
+                "lkhdf hfdhdf".to_owned(),
+            ]),
+        ],
+        a7: E1::U64(4),
+        a13: Some("fash".to_owned()),
+        a14: Some(E1::String("dgasdfgh".to_owned())),
+        a15: [4, 5, 8, 6],
+        a16: [E1::U64(3), E1::U64(4), E1::U64(3), E1::U64(553636732753657)],
+    }
+}
+
+fn get_example_longnum() -> ExType {
     A1 {
         a1: 3,
         a2: "asd".to_owned(),
@@ -43,7 +85,12 @@ fn get_example() -> ExType {
         a13: Some("fash".to_owned()),
         a14: Some(E1::String("dgasdfgh".to_owned())),
         a15: [152552464262, 3758566658, 656568474657, 856787596896],
-        a16: [E1::U64(4647), E1::U64(6645846), E1::U64(3457), E1::U64(2647)],
+        a16: [
+            E1::U64(4647),
+            E1::U64(6645846),
+            E1::U64(3457),
+            E1::U64(2647),
+        ],
     }
 }
 
@@ -145,21 +192,31 @@ fn bench_prost_deserialize(bench_group: &mut BenchmarkGroup<WallTime>, buf: &[u8
     });
 } */
 
-fn bench_my_deserialize_des(bench_group: &mut BenchmarkGroup<WallTime>) {
-    let ex = get_example();
+fn bench_my_deserialize_des_short(bench_group: &mut BenchmarkGroup<WallTime>) {
+    let ex = get_example_shortnum();
     let data = serde_encom::to_string(&ex).unwrap();
     bench_group.bench_with_input(
-        BenchmarkId::new("deserialize", 1),
+        BenchmarkId::new("deserialize short", 1),
+        data.as_bytes(),
+        |b, val| b.iter(|| serde_encom::from_slice::<A1>(val).unwrap()),
+    );
+}
+
+fn bench_my_deserialize_des_long(bench_group: &mut BenchmarkGroup<WallTime>) {
+    let ex = get_example_longnum();
+    let data = serde_encom::to_string(&ex).unwrap();
+    bench_group.bench_with_input(
+        BenchmarkId::new("deserialize long", 1),
         data.as_bytes(),
         |b, val| b.iter(|| serde_encom::from_slice::<A1>(val).unwrap()),
     );
 }
 
 fn bench_my_deserialize_value(bench_group: &mut BenchmarkGroup<WallTime>) {
-    let ex = get_example();
+    let ex = get_example_longnum();
     let data = serde_encom::to_string(&ex).unwrap();
     bench_group.bench_with_input(
-        BenchmarkId::new("deserialize value", 1),
+        BenchmarkId::new("deserialize value long", 1),
         data.as_bytes(),
         |b, val| b.iter(|| serde_encom::from_slice::<Value>(val).unwrap()),
     );
@@ -238,7 +295,8 @@ fn benchmark(c: &mut Criterion) {
         let data = serde_encom::ser::to_string(&example).unwrap();
         bench_my_deserialize4(&mut bench_group, data.as_bytes()); */
 
-        bench_my_deserialize_des(&mut bench_group);
+        bench_my_deserialize_des_short(&mut bench_group);
+        // bench_my_deserialize_des_long(&mut bench_group);
         // bench_my_deserialize_value(&mut bench_group);
 
         /* bench_group.bench_with_input(BenchmarkId::new("atoi", 1), "123456789012345", |b, val| {
