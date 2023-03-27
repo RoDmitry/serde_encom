@@ -1254,7 +1254,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                 _ => return Err(self.peek_error(ErrorCode::ExpectedSomeValue)),
             };
 
-            let (mut accept_comma, mut frame) = match frame {
+            let (mut accept_comma, frame) = match frame {
                 Some(frame) => (false, frame),
                 None => match enclosing.take() {
                     Some(frame) => (true, frame),
@@ -1992,11 +1992,8 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for &'a mut Deserializer<R> {
         V: de::Visitor<'de>,
     {
         // self.deserialize_str(visitor) // originaly
-        let peek = match self.parse_whitespace()? {
-            Some(b) => b,
-            None => {
-                return Err(self.peek_error(ErrorCode::EofWhileParsingValue));
-            }
+        if self.parse_whitespace()?.is_none() {
+            return Err(self.peek_error(ErrorCode::EofWhileParsingValue));
         };
 
         let value = {

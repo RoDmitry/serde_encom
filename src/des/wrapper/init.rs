@@ -117,12 +117,9 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for InitDeserializer<'a, R> {
     where
         V: de::Visitor<'de>,
     {
-        let peek = match self.des.parse_whitespace()? {
-            Some(b) => b,
-            None => {
-                return Err(self.des.peek_error(ErrorCode::EofWhileParsingValue));
-            }
-        };
+        /* if self.des.parse_whitespace()?.is_none() {
+            return Err(self.des.peek_error(ErrorCode::EofWhileParsingValue));
+        }; */
 
         let value = visitor.visit_seq(InitSeqAccess::new(self.des));
         match (value, self.des.end_seq_init()) {
@@ -156,12 +153,9 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for InitDeserializer<'a, R> {
     where
         V: de::Visitor<'de>,
     {
-        let peek = match self.des.parse_whitespace()? {
-            Some(b) => b,
-            None => {
-                return Err(self.des.peek_error(ErrorCode::EofWhileParsingValue));
-            }
-        };
+        /* if self.des.parse_whitespace()?.is_none() {
+            return Err(self.des.peek_error(ErrorCode::EofWhileParsingValue));
+        }; */
 
         let value = visitor.visit_map(InitMapAccess::new(self.des));
         match (value, self.des.end_map_init()) {
@@ -179,12 +173,9 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for InitDeserializer<'a, R> {
     where
         V: de::Visitor<'de>,
     {
-        let peek = match self.des.parse_whitespace()? {
-            Some(b) => b,
-            None => {
-                return Err(self.des.peek_error(ErrorCode::EofWhileParsingValue));
-            }
-        };
+        /* if self.des.parse_whitespace()?.is_none() {
+            return Err(self.des.peek_error(ErrorCode::EofWhileParsingValue));
+        }; */
 
         let value = visitor.visit_map(InitMapAccess::new(self.des));
         match (value, self.des.end_map_init()) {

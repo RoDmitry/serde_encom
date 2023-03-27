@@ -58,7 +58,7 @@ impl Error {
             | ErrorCode::EofWhileParsingString
             | ErrorCode::EofWhileParsingValue => ErrorCategory::Eof,
             ErrorCode::ExpectedColon
-            | ErrorCode::ExpectedListCommaOrEnd
+            // | ErrorCode::ExpectedListCommaOrEnd
             | ErrorCode::ExpectedObjectCommaOrEnd
             | ErrorCode::ExpectedSomeIdent
             | ErrorCode::ExpectedSomeValue
@@ -68,10 +68,10 @@ impl Error {
             | ErrorCode::InvalidUnicodeCodePoint
             | ErrorCode::ControlCharacterWhileParsingString
             | ErrorCode::KeyMustBeAString
-            | ErrorCode::LoneLeadingSurrogateInHexEscape
+            // | ErrorCode::LoneLeadingSurrogateInHexEscape
             | ErrorCode::TrailingComma
             | ErrorCode::TrailingCharacters
-            | ErrorCode::UnexpectedEndOfHexEscape
+            // | ErrorCode::UnexpectedEndOfHexEscape
             | ErrorCode::UnexpectedEndOfString
             | ErrorCode::RecursionLimitExceeded => ErrorCategory::Syntax,
         }
@@ -205,7 +205,7 @@ pub(crate) enum ErrorCode {
     ExpectedColon,
 
     /// Expected this character to be either a `','` or a `']'`.
-    ExpectedListCommaOrEnd,
+    // ExpectedListCommaOrEnd,
 
     /// Expected this character to be either a `','` or a `'}'`.
     ExpectedObjectCommaOrEnd,
@@ -235,7 +235,7 @@ pub(crate) enum ErrorCode {
     KeyMustBeAString,
 
     /// Lone leading surrogate in hex escape.
-    LoneLeadingSurrogateInHexEscape,
+    // LoneLeadingSurrogateInHexEscape,
 
     /// EnCom has a comma after the last value in an array or map.
     TrailingComma,
@@ -244,7 +244,7 @@ pub(crate) enum ErrorCode {
     TrailingCharacters,
 
     /// Unexpected end of hex escape.
-    UnexpectedEndOfHexEscape,
+    // UnexpectedEndOfHexEscape,
 
     /// Unexpected end of hex escape.
     UnexpectedEndOfString,
@@ -299,7 +299,7 @@ impl Display for ErrorCode {
             ErrorCode::EofWhileParsingString => f.write_str("EOF while parsing a string"),
             ErrorCode::EofWhileParsingValue => f.write_str("EOF while parsing a value"),
             ErrorCode::ExpectedColon => f.write_str("expected `:`"),
-            ErrorCode::ExpectedListCommaOrEnd => f.write_str("expected `,` or `]`"),
+            // ErrorCode::ExpectedListCommaOrEnd => f.write_str("expected `,` or `]`"),
             ErrorCode::ExpectedObjectCommaOrEnd => f.write_str("expected `,` or `}`"),
             ErrorCode::ExpectedSomeIdent => f.write_str("expected ident"),
             ErrorCode::ExpectedSomeValue => f.write_str("expected value"),
@@ -311,12 +311,12 @@ impl Display for ErrorCode {
                 f.write_str("control character (\\u0000-\\u001F) found while parsing a string")
             }
             ErrorCode::KeyMustBeAString => f.write_str("key must be a string"),
-            ErrorCode::LoneLeadingSurrogateInHexEscape => {
+            /* ErrorCode::LoneLeadingSurrogateInHexEscape => {
                 f.write_str("lone leading surrogate in hex escape")
-            }
+            } */
             ErrorCode::TrailingComma => f.write_str("trailing comma"),
             ErrorCode::TrailingCharacters => f.write_str("trailing characters"),
-            ErrorCode::UnexpectedEndOfHexEscape => f.write_str("unexpected end of hex escape"),
+            // ErrorCode::UnexpectedEndOfHexEscape => f.write_str("unexpected end of hex escape"),
             ErrorCode::UnexpectedEndOfString => f.write_str("unexpected end of string"),
             ErrorCode::RecursionLimitExceeded => f.write_str("recursion limit exceeded"),
         }
