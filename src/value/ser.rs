@@ -1,5 +1,4 @@
 use super::Map;
-use super::Number;
 use super::{to_value, Value};
 use crate::error::{Error, ErrorCode, Result};
 use alloc::borrow::ToOwned;
@@ -138,13 +137,13 @@ impl serde::Serializer for Serializer {
     }
 
     #[inline]
-    fn serialize_f32(self, value: f32) -> Result<Value> {
-        self.serialize_f64(value as f64)
+    fn serialize_f32(self, float: f32) -> Result<Value> {
+        Ok(Value::from(float))
     }
 
     #[inline]
-    fn serialize_f64(self, value: f64) -> Result<Value> {
-        Ok(Number::from_f64(value).map_or(Value::Null, Value::Number))
+    fn serialize_f64(self, float: f64) -> Result<Value> {
+        Ok(Value::from(float))
     }
 
     #[inline]
