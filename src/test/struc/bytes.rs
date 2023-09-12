@@ -1,4 +1,4 @@
-use crate::alloc::vec::Vec;
+use crate::{alloc::vec::Vec, test::to_string};
 use serde::{Deserialize, Serialize};
 
 pub type ExType = A1;
@@ -19,7 +19,7 @@ fn self_test() {
     let example = get_example();
     let example_str = crate::ser::to_vec(&example).unwrap();
     #[cfg(feature = "std")]
-    println!("{example_str:X?}");
+    println!("{}", to_string(&example_str));
 
     let example_des: ExType = crate::des::from_slice(&example_str).unwrap();
     assert_eq!(example, example_des);

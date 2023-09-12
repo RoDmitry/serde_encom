@@ -24,6 +24,10 @@ fn key_must_be_a_string() -> Error {
     Error::syntax(ErrorCode::KeyMustBeAString, 0, 0)
 }
 
+fn float_key_must_be_finite() -> Error {
+    Error::syntax(ErrorCode::FloatKeyMustBeFinite, 0, 0)
+}
+
 impl<'a, W, F> ser::Serializer for MapKeySerializer<'a, W, F>
 where
     W: io::Write,
@@ -63,8 +67,11 @@ where
     type SerializeStruct = Impossible<(), Error>;
     type SerializeStructVariant = Impossible<(), Error>;
 
-    fn serialize_bool(self, _value: bool) -> Result<()> {
-        Err(key_must_be_a_string())
+    fn serialize_bool(self, value: bool) -> Result<()> {
+        self.ser
+            .formatter
+            .write_bool(&mut self.ser.writer, value)
+            .map_err(Error::io)
     }
 
     #[inline]
@@ -147,12 +154,26 @@ where
             .map_err(Error::io)
     }
 
-    fn serialize_f32(self, _value: f32) -> Result<()> {
-        Err(key_must_be_a_string())
+    fn serialize_f32(self, value: f32) -> Result<()> {
+        if !value.is_finite() {
+            return Err(float_key_must_be_finite());
+        }
+
+        self.ser
+            .formatter
+            .write_f32(&mut self.ser.writer, value)
+            .map_err(Error::io)
     }
 
-    fn serialize_f64(self, _value: f64) -> Result<()> {
-        Err(key_must_be_a_string())
+    fn serialize_f64(self, value: f64) -> Result<()> {
+        if !value.is_finite() {
+            return Err(float_key_must_be_finite());
+        }
+
+        self.ser
+            .formatter
+            .write_f64(&mut self.ser.writer, value)
+            .map_err(Error::io)
     }
 
     fn serialize_char(self, value: char) -> Result<()> {
@@ -188,11 +209,11 @@ where
         Err(key_must_be_a_string())
     }
 
-    fn serialize_some<T>(self, _value: &T) -> Result<()>
+    fn serialize_some<T>(self, value: &T) -> Result<()>
     where
         T: ?Sized + Serialize,
     {
-        Err(key_must_be_a_string())
+        value.serialize(self)
     }
 
     fn serialize_seq(self, _len: Option<usize>) -> Result<Self::SerializeSeq> {

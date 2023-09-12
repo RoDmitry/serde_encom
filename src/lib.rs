@@ -1,4 +1,13 @@
 #![cfg_attr(not(feature = "std"), no_std)]
+// Ignored clippy lints
+#![allow(
+    clippy::explicit_auto_deref,
+    clippy::manual_range_contains,
+    clippy::match_like_matches_macro,
+    clippy::module_inception,
+    clippy::needless_doctest_main,
+    clippy::should_implement_trait
+)]
 
 extern crate alloc;
 

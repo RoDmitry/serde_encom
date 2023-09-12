@@ -10,6 +10,8 @@ use core::str::FromStr;
 use serde::{de, ser};
 #[cfg(feature = "std")]
 use std::error;
+#[cfg(feature = "std")]
+use std::io::ErrorKind;
 
 /// This type represents all possible errors that can occur when serializing or
 /// deserializing EnCom data.
@@ -62,12 +64,15 @@ impl Error {
             | ErrorCode::ExpectedObjectCommaOrEnd
             | ErrorCode::ExpectedSomeIdent
             | ErrorCode::ExpectedSomeValue
+            | ErrorCode::ExpectedDoubleQuote
             | ErrorCode::InvalidEscape
             | ErrorCode::InvalidNumber
             | ErrorCode::NumberOutOfRange
             | ErrorCode::InvalidUnicodeCodePoint
             | ErrorCode::ControlCharacterWhileParsingString
             | ErrorCode::KeyMustBeAString
+            | ErrorCode::ExpectedNumericKey
+            | ErrorCode::FloatKeyMustBeFinite
             // | ErrorCode::LoneLeadingSurrogateInHexEscape
             | ErrorCode::TrailingComma
             | ErrorCode::TrailingCharacters
@@ -105,6 +110,55 @@ impl Error {
     /// deserialization once more data is available.
     pub fn is_eof(&self) -> bool {
         self.classify() == ErrorCategory::Eof
+    }
+
+    /// The kind reported by the underlying standard library I/O error, if this
+    /// error was caused by a failure to read or write bytes on an I/O stream.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use serde_encom::Value;
+    /// use std::io::{self, ErrorKind, Read};
+    /// use std::process;
+    ///
+    /// struct ReaderThatWillTimeOut<'a>(&'a [u8]);
+    ///
+    /// impl<'a> Read for ReaderThatWillTimeOut<'a> {
+    ///     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+    ///         if self.0.is_empty() {
+    ///             Err(io::Error::new(ErrorKind::TimedOut, "timed out"))
+    ///         } else {
+    ///             self.0.read(buf)
+    ///         }
+    ///     }
+    /// }
+    ///
+    /// fn main() {
+    ///     let reader = ReaderThatWillTimeOut(br#" {"k": "#);
+    ///
+    ///     let _: Value = match serde_encom::from_reader(reader) {
+    ///         Ok(value) => value,
+    ///         Err(error) => {
+    ///             if error.io_error_kind() == Some(ErrorKind::TimedOut) {
+    ///                 // Maybe this application needs to retry certain kinds of errors.
+    ///
+    ///                 # return;
+    ///             } else {
+    ///                 eprintln!("error: {}", error);
+    ///                 process::exit(1);
+    ///             }
+    ///         }
+    ///     };
+    /// }
+    /// ```
+    #[cfg(feature = "std")]
+    pub fn io_error_kind(&self) -> Option<ErrorKind> {
+        if let ErrorCode::Io(io_error) = &self.err.code {
+            Some(io_error.kind())
+        } else {
+            None
+        }
     }
 }
 
@@ -168,9 +222,9 @@ impl From<Error> for io::Error {
             match j.classify() {
                 ErrorCategory::Io => unreachable!(),
                 ErrorCategory::Syntax | ErrorCategory::Data => {
-                    io::Error::new(io::ErrorKind::InvalidData, j)
+                    io::Error::new(ErrorKind::InvalidData, j)
                 }
-                ErrorCategory::Eof => io::Error::new(io::ErrorKind::UnexpectedEof, j),
+                ErrorCategory::Eof => io::Error::new(ErrorKind::UnexpectedEof, j),
             }
         }
     }
@@ -216,6 +270,9 @@ pub(crate) enum ErrorCode {
     /// Expected this character to start a EnCom value.
     ExpectedSomeValue,
 
+    /// Expected this character to be a `"`.
+    ExpectedDoubleQuote,
+
     /// Invalid hex escape code.
     InvalidEscape,
 
@@ -233,6 +290,12 @@ pub(crate) enum ErrorCode {
 
     /// Object key is not a string.
     KeyMustBeAString,
+
+    /// Contents of key were supposed to be a number.
+    ExpectedNumericKey,
+
+    /// Object key is a non-finite float value.
+    FloatKeyMustBeFinite,
 
     /// Lone leading surrogate in hex escape.
     // LoneLeadingSurrogateInHexEscape,
@@ -303,6 +366,7 @@ impl Display for ErrorCode {
             ErrorCode::ExpectedObjectCommaOrEnd => f.write_str("expected `,` or `}`"),
             ErrorCode::ExpectedSomeIdent => f.write_str("expected ident"),
             ErrorCode::ExpectedSomeValue => f.write_str("expected value"),
+            ErrorCode::ExpectedDoubleQuote => f.write_str("expected `\"`"),
             ErrorCode::InvalidEscape => f.write_str("invalid escape"),
             ErrorCode::InvalidNumber => f.write_str("invalid number"),
             ErrorCode::NumberOutOfRange => f.write_str("number out of range"),
@@ -311,6 +375,12 @@ impl Display for ErrorCode {
                 f.write_str("control character (\\u0000-\\u001F) found while parsing a string")
             }
             ErrorCode::KeyMustBeAString => f.write_str("key must be a string"),
+            ErrorCode::ExpectedNumericKey => {
+                f.write_str("invalid value: expected key to be a number in quotes")
+            }
+            ErrorCode::FloatKeyMustBeFinite => {
+                f.write_str("float key must be finite (got NaN or +/-inf)")
+            }
             /* ErrorCode::LoneLeadingSurrogateInHexEscape => {
                 f.write_str("lone leading surrogate in hex escape")
             } */

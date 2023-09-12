@@ -75,3 +75,11 @@ fn stream() {
     // If err.is_eof(), can join the remaining data to new data and continue.
     let remaining = &data[stream.byte_offset()..];
 } */
+
+pub(crate) fn to_string(input: &[u8]) -> String {
+    let mut res = String::with_capacity(input.len());
+    for &val in input {
+        res.push(val as char);
+    }
+    res
+}

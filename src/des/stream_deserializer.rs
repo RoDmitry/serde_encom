@@ -96,8 +96,7 @@ where
 
     fn peek_end_of_value(&mut self) -> Result<()> {
         match self.de.peek()? {
-            Some(b' ') | Some(b'\n') | Some(b'\t') | Some(b'\r') | Some(b'{') | Some(b'}')
-            | Some(b':') | None => Ok(()),
+            Some(b' ' | b'\n' | b'\t' | b'\r' | b'{' | b'}' | b':') | None => Ok(()),
             Some(_) => {
                 let position = self.de.read.peek_position();
                 Err(Error::syntax(
@@ -147,7 +146,7 @@ where
                         if self_delineated_value {
                             Ok(value)
                         } else {
-                            self.peek_end_of_value().map(|_| value)
+                            self.peek_end_of_value().map(|()| value)
                         }
                     }
                     Err(e) => {
