@@ -391,7 +391,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
     where
         V: de::Visitor<'de>,
     {
-        let parsed_int = self.read.read_int_until_invalid_pos()?;
+        let parsed_int = self.read.parse_int_until_invalid_pos()?;
         let ret = match self.peek()? {
             Some(b'=') => self.deserialize_str_by_len(visitor, parsed_int as usize),
             Some(b'~') => self.deserialize_bytes_by_len(visitor, parsed_int as usize),
@@ -493,6 +493,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         val
     }
 
+    // TODO: rewrite
     pub(crate) fn do_deserialize_i128<'any, V>(&mut self, visitor: V) -> Result<V::Value>
     where
         V: de::Visitor<'any>,
@@ -525,6 +526,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         }
     }
 
+    // TODO: rewrite
     pub(crate) fn do_deserialize_u128<'any, V>(&mut self, visitor: V) -> Result<V::Value>
     where
         V: de::Visitor<'any>,
@@ -555,6 +557,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         }
     }
 
+    // TODO: remove?
     fn scan_integer128(&mut self, buf: &mut String) -> Result<()> {
         match self.next_char_or_null()? {
             b'0' => {
@@ -599,7 +602,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         Ok(())
     } */
 
-    fn parse_integer_old(&mut self, positive: bool) -> Result<ParserNumber> {
+    /* fn parse_integer_old(&mut self, positive: bool) -> Result<ParserNumber> {
         let next = match self.next_char()? {
             Some(b) => b,
             None => {
@@ -658,15 +661,15 @@ impl<'de, R: Read<'de>> Deserializer<R> {
             }
             _ => Err(self.error(ErrorCode::InvalidNumber)),
         }
-    }
+    } */
 
     fn parse_integer(&mut self, positive: bool) -> Result<ParserNumber> {
-        if positive {
-            let significand = self.read.read_int_until_invalid_pos()?;
-            self.parse_number(positive, significand)
-        } else {
+        // if positive {
+        let significand = self.read.parse_int_until_invalid_pos()?;
+        self.parse_number(positive, significand)
+        /* } else {
             self.parse_integer_old(false)
-        }
+        } */
     }
 
     #[inline]
@@ -835,7 +838,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         Ok(if positive { f } else { -f })
     }
 
-    #[cfg(feature = "float_roundtrip")]
+    /* #[cfg(feature = "float_roundtrip")]
     #[cold]
     #[inline(never)]
     fn parse_long_integer(&mut self, positive: bool, partial_significand: u64) -> Result<f64> {
@@ -899,7 +902,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                 }
             }
         }
-    }
+    } */
 
     #[cfg(feature = "float_roundtrip")]
     #[cold]
@@ -1060,8 +1063,10 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         }
     }
 
+    // TODO: rewrite, but it's unreachable
     pub(crate) fn parse_any_signed_number(&mut self) -> Result<ParserNumber> {
-        let peek = match self.peek()? {
+        unreachable!();
+        /* let peek = match self.peek()? {
             Some(b) => b,
             None => {
                 return Err(self.peek_error(ErrorCode::EofWhileParsingValue));
@@ -1090,7 +1095,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
             // or `peek_error` so pick the one that seems correct more often.
             // Worst case, the position is off by one character.
             Err(err) => Err(self.fix_position(err)),
-        }
+        } */
     }
 
     #[cfg(not(feature = "arbitrary_precision"))]

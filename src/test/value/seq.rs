@@ -1,4 +1,4 @@
-use crate::{encom_from_json, Value};
+use crate::{encom_from_json, Number, Value};
 
 #[test]
 fn test_number() {
@@ -37,6 +37,20 @@ fn test_number_neg() {
     let res = encom_from_json!([-15]);
     assert_eq!(v, res);
     assert_eq!(v2, res);
+}
+
+#[test]
+fn test_number_neg_err() {
+    let data = "-15a";
+    let v = crate::from_str::<Value>(data);
+    if v.is_ok() {
+        panic!("error");
+    }
+
+    let v = crate::from_slice::<Value>(data.as_bytes());
+    if v.is_ok() {
+        panic!("error");
+    }
 }
 
 #[test]

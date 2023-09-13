@@ -1,6 +1,7 @@
 #![allow(clippy::zero_prefixed_literal)]
 
 use crate::error::{Error, ErrorCode, Result};
+use crate::safe_unchecked::SliceGetter;
 // use alloc::vec::Vec;
 // use core::char;
 use core::cmp;
@@ -15,7 +16,6 @@ use crate::io;
 use crate::raw::BorrowedRawDeserializer;
 #[cfg(all(feature = "raw_value", feature = "std"))]
 use crate::raw::OwnedRawDeserializer;
-use atoi_simd::parse_until_invalid_pos;
 #[cfg(feature = "raw_value")]
 use serde::de::Visitor;
 
@@ -64,7 +64,11 @@ pub trait Read<'de>: private::Sealed {
 
     fn read_slice<'s>(&'s mut self, len: usize) -> Result<&'de [u8]>;
 
-    fn read_int_until_invalid_pos(&mut self) -> Result<u64>;
+    fn parse_int_until_invalid_pos(&mut self) -> Result<u64>;
+
+    // fn parse_int(&mut self) -> Result<ParserNumber>;
+
+    // fn parse_int_until_invalid(&mut self) -> Result<ParserNumber>;
 
     fn str_from_saved(&mut self) -> Result<&'de str>;
 
@@ -348,9 +352,19 @@ where
     }
 
     #[inline]
-    fn read_int_until_invalid_pos(&mut self) -> Result<u64> {
+    fn parse_int_until_invalid_pos(&mut self) -> Result<u64> {
         unimplemented!()
     }
+
+    /* #[inline]
+    fn parse_int(&mut self) -> Result<ParserNumber> {
+        unimplemented!()
+    }
+
+    #[inline]
+    fn parse_int_until_invalid(&mut self) -> Result<ParserNumber> {
+        unimplemented!()
+    } */
 
     #[inline]
     fn str_from_saved(&mut self) -> Result<&'de str> {
@@ -600,11 +614,41 @@ impl<'de> Read<'de> for SliceRead<'de> {
     }
 
     #[inline]
-    fn read_int_until_invalid_pos(&mut self) -> Result<u64> {
-        let (res, i) = parse_until_invalid_pos(&self.slice[self.index..])?;
+    fn parse_int_until_invalid_pos(&mut self) -> Result<u64> {
+        let (res, i) =
+            atoi_simd::parse_until_invalid_pos(&self.slice.get_safe_unchecked(self.index..))?;
         self.index += i;
         Ok(res)
     }
+
+    /* #[inline]
+    fn parse_int(&mut self) -> Result<ParserNumber> {
+        let res = if *self.slice.first().ok_or(AtoiSimdError::Empty)? == b'-' {
+            self.index += 1;
+            ParserNumber::I64(atoi_simd::parse_neg(
+                &self.slice.get_safe_unchecked(self.index..),
+            )?)
+        } else {
+            ParserNumber::U64(atoi_simd::parse_pos(&self.slice[self.index..])?)
+        };
+        self.index = self.slice.len();
+        Ok(res)
+    }
+
+    #[inline]
+    fn parse_int_until_invalid(&mut self) -> Result<ParserNumber> {
+        let (res, i) = if *self.slice.first().ok_or(AtoiSimdError::Empty)? == b'-' {
+            self.index += 1;
+            let (v, l) =
+                atoi_simd::parse_until_invalid_neg(&self.slice.get_safe_unchecked(self.index..))?;
+            (ParserNumber::I64(v), l)
+        } else {
+            let (v, l) = atoi_simd::parse_until_invalid_pos(&self.slice[self.index..])?;
+            (ParserNumber::U64(v), l)
+        };
+        self.index += i;
+        Ok(res)
+    } */
 
     #[inline]
     fn str_from_saved(&mut self) -> Result<&'de str> {
@@ -771,9 +815,19 @@ impl<'de> Read<'de> for StrRead<'de> {
     }
 
     #[inline]
-    fn read_int_until_invalid_pos(&mut self) -> Result<u64> {
-        self.delegate.read_int_until_invalid_pos()
+    fn parse_int_until_invalid_pos(&mut self) -> Result<u64> {
+        self.delegate.parse_int_until_invalid_pos()
     }
+
+    /* #[inline]
+    fn parse_int(&mut self) -> Result<ParserNumber> {
+        self.delegate.parse_int()
+    }
+
+    #[inline]
+    fn parse_int_until_invalid(&mut self) -> Result<ParserNumber> {
+        self.delegate.parse_int_until_invalid()
+    } */
 
     #[inline]
     fn str_from_saved(&mut self) -> Result<&'de str> {
@@ -900,9 +954,19 @@ where
     }
 
     #[inline]
-    fn read_int_until_invalid_pos(&mut self) -> Result<u64> {
-        R::read_int_until_invalid_pos(self)
+    fn parse_int_until_invalid_pos(&mut self) -> Result<u64> {
+        R::parse_int_until_invalid_pos(self)
     }
+
+    /* #[inline]
+    fn parse_int(&mut self) -> Result<ParserNumber> {
+        R::parse_int(self)
+    }
+
+    #[inline]
+    fn parse_int_until_invalid(&mut self) -> Result<ParserNumber> {
+        R::parse_int_until_invalid(self)
+    } */
 
     #[inline]
     fn str_from_saved(&mut self) -> Result<&'de str> {
