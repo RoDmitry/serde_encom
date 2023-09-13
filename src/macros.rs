@@ -1,4 +1,4 @@
-/// Construct a `serde_encom::Value` from a EnCom literal.
+/// Construct a `serde_encom::Value` from an EnCom literal.
 ///
 /// ```
 /// # use serde_encom::encom_from_json;

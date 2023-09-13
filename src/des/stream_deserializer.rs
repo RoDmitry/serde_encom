@@ -40,7 +40,7 @@ where
     R: Read<'de>,
     T: de::Deserialize<'de>,
 {
-    /// Create a EnCom stream deserializer from one of the possible serde_encom
+    /// Create an EnCom stream deserializer from one of the possible serde_encom
     /// input sources.
     ///
     /// Typically it is more convenient to use one of these methods instead:

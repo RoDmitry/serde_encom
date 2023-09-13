@@ -17,7 +17,7 @@ use serde::{forward_to_deserialize_any, Deserialize, Deserializer, Serialize, Se
 #[cfg(feature = "arbitrary_precision")]
 pub(crate) const TOKEN: &str = "$serde_encom::private::Number";
 
-/// Represents a EnCom number, whether integer or floating point.
+/// Represents an EnCom number, whether integer or floating point.
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Number {
     n: N,
@@ -406,7 +406,7 @@ impl<'de> Deserialize<'de> for Number {
             type Value = Number;
 
             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                formatter.write_str("a EnCom number")
+                formatter.write_str("an EnCom number")
             }
 
             #[inline]
@@ -424,7 +424,7 @@ impl<'de> Deserialize<'de> for Number {
             where
                 E: de::Error,
             {
-                Number::from_f64(value).ok_or_else(|| de::Error::custom("not a EnCom number"))
+                Number::from_f64(value).ok_or_else(|| de::Error::custom("not an EnCom number"))
             }
 
             #[cfg(feature = "arbitrary_precision")]

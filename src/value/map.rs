@@ -22,7 +22,7 @@ use alloc::collections::{btree_map, BTreeMap};
 #[cfg(feature = "preserve_order")]
 use indexmap::{self, IndexMap};
 
-/// Represents a EnCom key/value type.
+/// Represents an EnCom key/value type.
 pub struct Map<K, V> {
     map: MapImpl<K, V>,
 }

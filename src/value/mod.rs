@@ -117,7 +117,7 @@ pub use crate::raw::{to_raw_value, RawValue};
 /// See the [`serde_encom::value` module documentation](self) for usage examples.
 #[derive(Clone, Eq, PartialEq)]
 pub enum Value {
-    /// Represents a EnCom null value.
+    /// Represents an EnCom null value.
     ///
     /// ```
     /// # use serde_encom::encom_from_json;
@@ -126,7 +126,7 @@ pub enum Value {
     /// ```
     Null,
 
-    /// Represents a EnCom boolean.
+    /// Represents an EnCom boolean.
     ///
     /// ```
     /// # use serde_encom::encom_from_json;
@@ -135,7 +135,7 @@ pub enum Value {
     /// ```
     Bool(bool),
 
-    /// Represents a EnCom number, whether integer or floating point.
+    /// Represents an EnCom number, whether integer or floating point.
     ///
     /// ```
     /// # use serde_encom::encom_from_json;
@@ -144,7 +144,7 @@ pub enum Value {
     /// ```
     Number(Number),
 
-    /// Represents a EnCom string.
+    /// Represents an EnCom string.
     ///
     /// ```
     /// # use serde_encom::encom_from_json;
@@ -153,7 +153,7 @@ pub enum Value {
     /// ```
     String(String),
 
-    /// Represents a EnCom bytes.
+    /// Represents an EnCom bytes.
     ///
     /// ```
     /// # use serde_encom::encom_from_json;
@@ -162,7 +162,7 @@ pub enum Value {
     /// ```
     Bytes(Vec<u8>),
 
-    /// Represents a EnCom array.
+    /// Represents an EnCom array.
     ///
     /// ```
     /// # use serde_encom::encom_from_json;
@@ -171,7 +171,7 @@ pub enum Value {
     /// ```
     Array(Vec<Value>),
 
-    /// Represents a EnCom object.
+    /// Represents an EnCom object.
     ///
     /// By default the map is backed by a BTreeMap. Enable the `preserve_order`
     /// feature of serde_encom to use IndexMap instead, which preserves
@@ -208,7 +208,7 @@ impl Debug for Value {
 }
 
 impl Display for Value {
-    /// Display a EnCom value as a string.
+    /// Display an EnCom value as a string.
     ///
     /// ```
     /// # use serde_encom::encom_from_json;
@@ -275,7 +275,7 @@ fn parse_index(s: &str) -> Option<usize> {
 }
 
 impl Value {
-    /// Index into a EnCom array or map. A string index can be used to access a
+    /// Index into an EnCom array or map. A string index can be used to access a
     /// value in a map, and a usize index can be used to access an element of an
     /// array.
     ///
@@ -317,7 +317,7 @@ impl Value {
         index.index_into(self)
     }
 
-    /// Mutably index into a EnCom array or map. A string index can be used to
+    /// Mutably index into an EnCom array or map. A string index can be used to
     /// access a value in a map, and a usize index can be used to access an
     /// element of an array.
     ///
@@ -761,7 +761,7 @@ impl Value {
         }
     }
 
-    /// Looks up a value by a EnCom Pointer.
+    /// Looks up a value by an EnCom Pointer.
     ///
     /// EnCom Pointer defines a string syntax for identifying a specific value
     /// within a JavaScript Object Notation (EnCom) document.
@@ -805,7 +805,7 @@ impl Value {
             })
     }
 
-    /// Looks up a value by a EnCom Pointer and returns a mutable reference to
+    /// Looks up a value by an EnCom Pointer and returns a mutable reference to
     /// that value.
     ///
     /// EnCom Pointer defines a string syntax for identifying a specific value
@@ -1008,7 +1008,7 @@ where
 ///
 /// This conversion can fail if the structure of the Value does not match the
 /// structure expected by `T`, for example if `T` is a struct type but the Value
-/// contains something other than a EnCom map. It can also fail if the structure
+/// contains something other than an EnCom map. It can also fail if the structure
 /// is correct but `T`'s implementation of `Deserialize` decides that something
 /// is wrong with the data, for example required struct fields are missing from
 /// the EnCom map or some number is too big to fit in the expected primitive

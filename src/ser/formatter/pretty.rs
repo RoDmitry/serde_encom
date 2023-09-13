@@ -1,7 +1,7 @@
 use super::formatter::Formatter;
 use crate::io;
 
-/// This structure pretty prints a EnCom value to make it human readable.
+/// This structure pretty prints an EnCom value to make it human readable.
 #[derive(Clone, Debug)]
 pub(crate) struct PrettyFormatter<'a> {
     current_indent: usize,

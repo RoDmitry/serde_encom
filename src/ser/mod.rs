@@ -483,7 +483,7 @@ where
     value.serialize(InitSerializer { ser: &mut ser })
 }
 
-/// Serialize the given data structure as a EnCom byte vector.
+/// Serialize the given data structure as an EnCom byte vector.
 ///
 /// # Errors
 ///

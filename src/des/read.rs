@@ -72,13 +72,13 @@ pub trait Read<'de>: private::Sealed {
 
     fn str_from_saved(&mut self) -> Result<&'de str>;
 
-    /// Assumes the previous byte was a quotation mark. Parses a EnCom-escaped
+    /// Assumes the previous byte was a quotation mark. Parses an EnCom-escaped
     /// string until the next quotation mark using the given scratch space if
     /// necessary. The scratch space is initially empty.
     #[doc(hidden)]
     fn parse_str<'s>(&'s mut self) -> Result<Reference<'de, 's, str>>;
 
-    // Assumes the previous byte was a quotation mark. Parses a EnCom-escaped
+    // Assumes the previous byte was a quotation mark. Parses an EnCom-escaped
     // string until the next quotation mark using the given scratch space if
     // necessary. The scratch space is initially empty.
     //
@@ -87,7 +87,7 @@ pub trait Read<'de>: private::Sealed {
     //#[doc(hidden)]
     //fn parse_str_raw<'s>(&'s mut self) -> Result<Reference<'de, 's, [u8]>>;
 
-    /// Assumes the previous byte was a quotation mark. Parses a EnCom-escaped
+    /// Assumes the previous byte was a quotation mark. Parses an EnCom-escaped
     /// string until the next quotation mark but discards the data.
     #[doc(hidden)]
     fn ignore_str(&mut self) -> Result<()>;
@@ -207,7 +207,7 @@ impl<R> IoRead<R>
 where
     R: io::Read,
 {
-    /// Create a EnCom input source to read from a std::io input stream.
+    /// Create an EnCom input source to read from a std::io input stream.
     pub fn new(reader: R) -> Self {
         IoRead {
             iter: LineColIterator::new(reader.bytes()),
@@ -469,7 +469,7 @@ where
 //////////////////////////////////////////////////////////////////////////////
 
 impl<'de> SliceRead<'de> {
-    /// Create a EnCom input source to read from a slice of bytes.
+    /// Create an EnCom input source to read from a slice of bytes.
     pub fn new(slice: &'de [u8]) -> Self {
         SliceRead {
             slice,
@@ -761,7 +761,7 @@ impl<'de> Read<'de> for SliceRead<'de> {
 //////////////////////////////////////////////////////////////////////////////
 
 impl<'a> StrRead<'a> {
-    /// Create a EnCom input source to read from a UTF-8 string.
+    /// Create an EnCom input source to read from a UTF-8 string.
     pub fn new(s: &'a str) -> Self {
         StrRead {
             delegate: SliceRead::new(s.as_bytes()),
@@ -1107,7 +1107,7 @@ fn as_str<'de, 's, R: Read<'de>>(read: &R, slice: &'s [u8]) -> Result<&'s str> {
     str::from_utf8(slice).or_else(|_| error(read, ErrorCode::InvalidUnicodeCodePoint))
 }
 
-/// Parses a EnCom escape sequence and appends it into the scratch space. Assumes
+/// Parses an EnCom escape sequence and appends it into the scratch space. Assumes
 /// the previous byte read was a backslash.
 /* fn parse_escape<'de, R: Read<'de>>(
     read: &mut R,
@@ -1209,7 +1209,7 @@ fn as_str<'de, 's, R: Read<'de>>(read: &R, slice: &'s [u8]) -> Result<&'s str> {
     Ok(())
 } */
 
-/// Parses a EnCom escape sequence and discards the value. Assumes the previous
+/// Parses an EnCom escape sequence and discards the value. Assumes the previous
 /// byte read was a backslash.
 /* fn ignore_escape<'de, R>(read: &mut R) -> Result<()>
 where

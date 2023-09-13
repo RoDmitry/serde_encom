@@ -9,8 +9,8 @@ use core::ops;
 ///
 /// The [`get`] and [`get_mut`] methods of `Value` accept any type that
 /// implements `Index`, as does the [square-bracket indexing operator]. This
-/// trait is implemented for strings which are used as the index into a EnCom
-/// map, and for `usize` which is used as the index into a EnCom array.
+/// trait is implemented for strings which are used as the index into an EnCom
+/// map, and for `usize` which is used as the index into an EnCom array.
 ///
 /// [`get`]: ../enum.Value.html#method.get
 /// [`get_mut`]: ../enum.Value.html#method.get_mut
@@ -26,10 +26,10 @@ use core::ops;
 /// #
 /// let data = encom_from_json!({ "inner": [1, 2, 3] });
 ///
-/// // Data is a EnCom map so it can be indexed with a string.
+/// // Data is an EnCom map so it can be indexed with a string.
 /// let inner = &data["inner"];
 ///
-/// // Inner is a EnCom array so it can be indexed with an integer.
+/// // Inner is an EnCom array so it can be indexed with an integer.
 /// let first = &inner[0];
 ///
 /// assert_eq!(first, 1);

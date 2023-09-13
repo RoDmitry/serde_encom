@@ -252,7 +252,7 @@ pub(crate) enum ErrorCode {
     /// EOF while parsing a string.
     EofWhileParsingString,
 
-    /// EOF while parsing a EnCom value.
+    /// EOF while parsing an EnCom value.
     EofWhileParsingValue,
 
     /// Expected this character to be a `':'`.
@@ -267,7 +267,7 @@ pub(crate) enum ErrorCode {
     /// Expected to parse either a `true`, `false`, or a `null`.
     ExpectedSomeIdent,
 
-    /// Expected this character to start a EnCom value.
+    /// Expected this character to start an EnCom value.
     ExpectedSomeValue,
 
     /// Expected this character to be a `"`.

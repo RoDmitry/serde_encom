@@ -121,7 +121,7 @@ impl<'de, R> Deserializer<R>
 where
     R: Read<'de>,
 {
-    /// Create a EnCom deserializer from one of the possible serde_encom input
+    /// Create an EnCom deserializer from one of the possible serde_encom input
     /// sources.
     ///
     /// Typically it is more convenient to use one of these methods instead:
@@ -146,7 +146,7 @@ impl<R> Deserializer<IoRead<R>>
 where
     R: crate::io::Read,
 {
-    /// Creates a EnCom deserializer from an `io::Read`.
+    /// Creates an EnCom deserializer from an `io::Read`.
     ///
     /// Reader-based deserializers do not support deserializing borrowed types
     /// like `&str`, since the `std::io::Read` trait has no non-copying methods
@@ -157,14 +157,14 @@ where
 }
 
 impl<'a> Deserializer<SliceRead<'a>> {
-    /// Creates a EnCom deserializer from a `&[u8]`.
+    /// Creates an EnCom deserializer from a `&[u8]`.
     pub fn from_slice(bytes: &'a [u8]) -> Self {
         Deserializer::new(SliceRead::new(bytes))
     }
 }
 
 impl<'a> Deserializer<StrRead<'a>> {
-    /// Creates a EnCom deserializer from a `&str`.
+    /// Creates an EnCom deserializer from a `&str`.
     pub fn from_str(s: &'a str) -> Self {
         Deserializer::new(StrRead::new(s))
     }
@@ -197,7 +197,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         }
     }
 
-    /// Turn a EnCom deserializer into an iterator over values of type T.
+    /// Turn an EnCom deserializer into an iterator over values of type T.
     pub fn into_iter<T>(self) -> StreamDeserializer<'de, R, T>
     where
         T: de::Deserialize<'de>,
@@ -1670,13 +1670,13 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for &'a mut Deserializer<R> {
         self.deserialize_str(visitor)
     }
 
-    /// Parses a EnCom string as bytes. Note that this function does not check
+    /// Parses an EnCom string as bytes. Note that this function does not check
     /// whether the bytes represent a valid UTF-8 string.
     ///
     /// The relevant part of the EnCom specification is Section 8.2 of [RFC
     /// 7159]:
     ///
-    /// > When all the strings represented in a EnCom text are composed entirely
+    /// > When all the strings represented in an EnCom text are composed entirely
     /// > of Unicode characters (however escaped), then that EnCom text is
     /// > interoperable in the sense that all software implementations that
     /// > parse it will agree on the contents of names and of string values in

@@ -149,7 +149,7 @@ where
 ///
 /// This conversion can fail if the structure of the input does not match the
 /// structure expected by `T`, for example if `T` is a struct type but the input
-/// contains something other than a EnCom map. It can also fail if the structure
+/// contains something other than an EnCom map. It can also fail if the structure
 /// is correct but `T`'s implementation of `Deserialize` decides that something
 /// is wrong with the data, for example required struct fields are missing from
 /// the EnCom map or some number is too big to fit in the expected primitive
@@ -193,7 +193,7 @@ where
 ///
 /// This conversion can fail if the structure of the input does not match the
 /// structure expected by `T`, for example if `T` is a struct type but the input
-/// contains something other than a EnCom map. It can also fail if the structure
+/// contains something other than an EnCom map. It can also fail if the structure
 /// is correct but `T`'s implementation of `Deserialize` decides that something
 /// is wrong with the data, for example required struct fields are missing from
 /// the EnCom map or some number is too big to fit in the expected primitive
@@ -234,7 +234,7 @@ where
 ///
 /// This conversion can fail if the structure of the input does not match the
 /// structure expected by `T`, for example if `T` is a struct type but the input
-/// contains something other than a EnCom map. It can also fail if the structure
+/// contains something other than an EnCom map. It can also fail if the structure
 /// is correct but `T`'s implementation of `Deserialize` decides that something
 /// is wrong with the data, for example required struct fields are missing from
 /// the EnCom map or some number is too big to fit in the expected primitive
