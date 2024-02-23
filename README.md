@@ -14,11 +14,13 @@ If you are using string `&str` or byte `&[u8]` slice in your resulting structure
 You can try `encom_from_json!()` macro to convert your own JSON and test it. Resulting EnCom will be sorted alphabetically.
 
 ## Todo:
-- [ ] Skip Option::None by default, and only if `#[serde(serialize_with = "path")]` is passed, then serialize None
 - [ ] Fix Stream deserializer
 - [ ] Fix File deserializer
 - [ ] Fix extra space after `}` in serializer
 - [ ] Fix parse exponent in deserializer
 - [ ] Change errors
+
+Maybe:
+Skip Option::None by default, and only if `#[serde(serialize_with = "path")]` is passed, then serialize None
 
 ### Thanks [serde_json](https://github.com/serde-rs/json) and it's [contributors](https://github.com/serde-rs/json/graphs/contributors) for the base code that was used it this project
