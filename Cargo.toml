@@ -16,7 +16,7 @@ name = "serde_encom"
 path = "src/lib.rs"
 
 [dependencies]
-atoi_simd = "0.15"
+atoi_simd = "0.16"
 indexmap = { version = "2", optional = true }
 itoa = "1"
 ryu = "1"

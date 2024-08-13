@@ -391,7 +391,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
     where
         V: de::Visitor<'de>,
     {
-        let parsed_int = self.read.parse_int_until_invalid_pos()?;
+        let parsed_int = self.read.parse_int_any_pos()?;
         let ret = match self.peek()? {
             Some(b'=') => self.deserialize_str_by_len(visitor, parsed_int as usize),
             Some(b'~') => self.deserialize_bytes_by_len(visitor, parsed_int as usize),
@@ -665,7 +665,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
 
     fn parse_integer(&mut self, positive: bool) -> Result<ParserNumber> {
         // if positive {
-        let significand = self.read.parse_int_until_invalid_pos()?;
+        let significand = self.read.parse_int_any_pos()?;
         self.parse_number(positive, significand)
         /* } else {
             self.parse_integer_old(false)

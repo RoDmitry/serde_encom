@@ -64,11 +64,11 @@ pub trait Read<'de>: private::Sealed {
 
     fn read_slice<'s>(&'s mut self, len: usize) -> Result<&'de [u8]>;
 
-    fn parse_int_until_invalid_pos(&mut self) -> Result<u64>;
+    fn parse_int_any_pos(&mut self) -> Result<u64>;
 
     // fn parse_int(&mut self) -> Result<ParserNumber>;
 
-    // fn parse_int_until_invalid(&mut self) -> Result<ParserNumber>;
+    // fn parse_int_any(&mut self) -> Result<ParserNumber>;
 
     fn str_from_saved(&mut self) -> Result<&'de str>;
 
@@ -352,7 +352,7 @@ where
     }
 
     #[inline]
-    fn parse_int_until_invalid_pos(&mut self) -> Result<u64> {
+    fn parse_int_any_pos(&mut self) -> Result<u64> {
         unimplemented!()
     }
 
@@ -362,7 +362,7 @@ where
     }
 
     #[inline]
-    fn parse_int_until_invalid(&mut self) -> Result<ParserNumber> {
+    fn parse_int_any(&mut self) -> Result<ParserNumber> {
         unimplemented!()
     } */
 
@@ -614,9 +614,9 @@ impl<'de> Read<'de> for SliceRead<'de> {
     }
 
     #[inline]
-    fn parse_int_until_invalid_pos(&mut self) -> Result<u64> {
+    fn parse_int_any_pos(&mut self) -> Result<u64> {
         let (res, i) =
-            atoi_simd::parse_until_invalid_pos(&self.slice.get_safe_unchecked(self.index..))?;
+            atoi_simd::parse_any_pos(&self.slice.get_safe_unchecked(self.index..))?;
         self.index += i;
         Ok(res)
     }
@@ -636,14 +636,14 @@ impl<'de> Read<'de> for SliceRead<'de> {
     }
 
     #[inline]
-    fn parse_int_until_invalid(&mut self) -> Result<ParserNumber> {
+    fn parse_int_any(&mut self) -> Result<ParserNumber> {
         let (res, i) = if *self.slice.first().ok_or(AtoiSimdError::Empty)? == b'-' {
             self.index += 1;
             let (v, l) =
-                atoi_simd::parse_until_invalid_neg(&self.slice.get_safe_unchecked(self.index..))?;
+                atoi_simd::parse_any_neg(&self.slice.get_safe_unchecked(self.index..))?;
             (ParserNumber::I64(v), l)
         } else {
-            let (v, l) = atoi_simd::parse_until_invalid_pos(&self.slice[self.index..])?;
+            let (v, l) = atoi_simd::parse_any_pos(&self.slice[self.index..])?;
             (ParserNumber::U64(v), l)
         };
         self.index += i;
@@ -815,8 +815,8 @@ impl<'de> Read<'de> for StrRead<'de> {
     }
 
     #[inline]
-    fn parse_int_until_invalid_pos(&mut self) -> Result<u64> {
-        self.delegate.parse_int_until_invalid_pos()
+    fn parse_int_any_pos(&mut self) -> Result<u64> {
+        self.delegate.parse_int_any_pos()
     }
 
     /* #[inline]
@@ -825,8 +825,8 @@ impl<'de> Read<'de> for StrRead<'de> {
     }
 
     #[inline]
-    fn parse_int_until_invalid(&mut self) -> Result<ParserNumber> {
-        self.delegate.parse_int_until_invalid()
+    fn parse_int_any(&mut self) -> Result<ParserNumber> {
+        self.delegate.parse_int_any()
     } */
 
     #[inline]
@@ -954,8 +954,8 @@ where
     }
 
     #[inline]
-    fn parse_int_until_invalid_pos(&mut self) -> Result<u64> {
-        R::parse_int_until_invalid_pos(self)
+    fn parse_int_any_pos(&mut self) -> Result<u64> {
+        R::parse_int_any_pos(self)
     }
 
     /* #[inline]
@@ -964,8 +964,8 @@ where
     }
 
     #[inline]
-    fn parse_int_until_invalid(&mut self) -> Result<ParserNumber> {
-        R::parse_int_until_invalid(self)
+    fn parse_int_any(&mut self) -> Result<ParserNumber> {
+        R::parse_int_any(self)
     } */
 
     #[inline]
