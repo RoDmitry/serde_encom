@@ -16,7 +16,6 @@ mod error;
 mod features_check;
 mod io;
 mod macros;
-mod safe_unchecked;
 mod ser;
 #[cfg(test)]
 mod test;

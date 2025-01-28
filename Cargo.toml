@@ -17,6 +17,7 @@ path = "src/lib.rs"
 
 [dependencies]
 atoi_simd = "0.16"
+debug_unsafe = "0.1"
 indexmap = { version = "2", optional = true }
 itoa = "1"
 ryu = "1"
