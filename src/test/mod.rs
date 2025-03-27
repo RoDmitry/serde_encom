@@ -8,6 +8,8 @@ mod struc;
 #[cfg(feature = "std")]
 mod value;
 #[cfg(feature = "std")]
+mod vec_char;
+#[cfg(feature = "std")]
 mod vec_int;
 #[cfg(feature = "std")]
 mod vec_option_int;
