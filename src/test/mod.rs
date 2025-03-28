@@ -3,18 +3,14 @@ use crate::encom_from_json;
 
 mod bytes;
 mod int;
+#[cfg(feature = "std")]
+mod map;
 mod option_int;
 mod struc;
 #[cfg(feature = "std")]
 mod value;
 #[cfg(feature = "std")]
-mod vec_char;
-#[cfg(feature = "std")]
-mod vec_int;
-#[cfg(feature = "std")]
-mod vec_option_int;
-#[cfg(feature = "std")]
-mod vec_str;
+mod vec;
 
 #[cfg(feature = "std")]
 #[test]
@@ -44,7 +40,6 @@ fn example_json() {
         },
         "useJSON": false
     });
-    #[cfg(feature = "std")]
     println!("{v:#}");
 }
 
@@ -52,7 +47,6 @@ fn example_json() {
 #[test]
 fn example_json_compact() {
     let v = encom_from_json!({"1": [{"1": 1, "2": "admin", "3": 10.4, "4": "main", "5": 2}, {"1": 4, "2": "", "3": -2.3, "4": "other", "5": 5}], "2": null, "3": true, "4": {"1": "/static/*", "2": "/tools/*"}, "5": false});
-    #[cfg(feature = "std")]
     println!("{v}");
 }
 
