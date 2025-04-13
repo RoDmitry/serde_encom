@@ -1,10 +1,10 @@
-use crate::{encom_from_json, Value};
+use serde_encom::{encom_from_json, Value};
 
 #[test]
 fn test_data() {
     let data = "3{2:6 6{33 22}}";
-    let v: Value = crate::from_str(data).unwrap();
-    let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
+    let v: Value = serde_encom::from_str(data).unwrap();
+    let v2: Value = serde_encom::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
     let res = encom_from_json!({
@@ -27,8 +27,8 @@ fn test_data2() {
              11=+44 2345678
          }
      "#;
-    let v: Value = crate::from_str(data).unwrap();
-    let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
+    let v: Value = serde_encom::from_str(data).unwrap();
+    let v2: Value = serde_encom::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
     let res = encom_from_json!({
@@ -46,8 +46,8 @@ fn test_data2() {
 #[test]
 fn test_str() {
     let data = "name:8=John Doe";
-    let v: Value = crate::from_str(data).unwrap();
-    let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
+    let v: Value = serde_encom::from_str(data).unwrap();
+    let v2: Value = serde_encom::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
     let res = encom_from_json!({"name": "John Doe"});
@@ -58,8 +58,8 @@ fn test_str() {
 #[test]
 fn test_slash() {
     let data = "name/surname:8=John Doe";
-    let v: Value = crate::from_str(data).unwrap();
-    let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
+    let v: Value = serde_encom::from_str(data).unwrap();
+    let v2: Value = serde_encom::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
     let res = encom_from_json!({"name/surname": "John Doe"});
@@ -70,8 +70,8 @@ fn test_slash() {
 #[test]
 fn test_zero_str() {
     let data = "str:0=";
-    let v: Value = crate::from_str(data).unwrap();
-    let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
+    let v: Value = serde_encom::from_str(data).unwrap();
+    let v2: Value = serde_encom::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
     let res = encom_from_json!({"str": ""});
@@ -82,8 +82,8 @@ fn test_zero_str() {
 #[test]
 fn test_zero_str2() {
     let data = "str:0= str2:0=";
-    let v: Value = crate::from_str(data).unwrap();
-    let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
+    let v: Value = serde_encom::from_str(data).unwrap();
+    let v2: Value = serde_encom::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
     let res = encom_from_json!({"str": "", "str2": ""});
@@ -94,8 +94,8 @@ fn test_zero_str2() {
 #[test]
 fn test_map() {
     let data = "a:8";
-    let v: Value = crate::from_str(data).unwrap();
-    let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
+    let v: Value = serde_encom::from_str(data).unwrap();
+    let v2: Value = serde_encom::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
     let res = encom_from_json!({"a": 8});
@@ -106,8 +106,8 @@ fn test_map() {
 #[test]
 fn test_null() {
     let data = "a:n";
-    let v: Value = crate::from_str(data).unwrap();
-    let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
+    let v: Value = serde_encom::from_str(data).unwrap();
+    let v2: Value = serde_encom::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
     let res = encom_from_json!({ "a": null });
@@ -118,8 +118,8 @@ fn test_null() {
 #[test]
 fn test_null2() {
     let data = "a:n b:n";
-    let v: Value = crate::from_str(data).unwrap();
-    let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
+    let v: Value = serde_encom::from_str(data).unwrap();
+    let v2: Value = serde_encom::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
     let res = encom_from_json!({ "a": null, "b": null });
@@ -130,8 +130,8 @@ fn test_null2() {
 #[test]
 fn test_number_neg() {
     let data = "a:-15";
-    let v: Value = crate::from_str(data).unwrap();
-    let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
+    let v: Value = serde_encom::from_str(data).unwrap();
+    let v2: Value = serde_encom::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
     let res = encom_from_json!({ "a": -15 });
@@ -142,8 +142,8 @@ fn test_number_neg() {
 #[test]
 fn test_number_float() {
     let data = "a:1.5";
-    let v: Value = crate::from_str(data).unwrap();
-    let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
+    let v: Value = serde_encom::from_str(data).unwrap();
+    let v2: Value = serde_encom::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
     let res = encom_from_json!({ "a": 1.5 });
@@ -154,8 +154,8 @@ fn test_number_float() {
 #[test]
 fn test_number_neg_float() {
     let data = "a:-1.5";
-    let v: Value = crate::from_str(data).unwrap();
-    let v2: Value = crate::from_slice(data.as_bytes()).unwrap();
+    let v: Value = serde_encom::from_str(data).unwrap();
+    let v2: Value = serde_encom::from_slice(data.as_bytes()).unwrap();
 
     println!("{v}");
     let res = encom_from_json!({ "a": -1.5 });

@@ -1,5 +1,5 @@
 #[cfg(feature = "std")]
-use crate::encom_from_json;
+use serde_encom::encom_from_json;
 
 mod bytes;
 mod int;
@@ -54,7 +54,7 @@ fn example_json_compact() {
 #[test]
 fn stream() {
     let data = b"0 1 ";
-    let des = crate::Deserializer::from_slice(data);
+    let des = serde_encomerializer::from_slice(data);
     let init_des = InitDeserializer { des: &mut des };
     let mut stream = init_des.into_iter::<Vec<i32>>();
 

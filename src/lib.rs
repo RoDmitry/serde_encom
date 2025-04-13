@@ -17,8 +17,6 @@ mod features_check;
 mod io;
 mod macros;
 mod ser;
-#[cfg(test)]
-mod test;
 mod value;
 
 pub use crate::des::*;

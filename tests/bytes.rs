@@ -1,7 +1,7 @@
 #[test]
 fn look_at_bytes() {
     let encom_data = b"3~\xE5\x00\xE5";
-    let bytes: &[u8] = crate::from_slice(encom_data).unwrap();
+    let bytes: &[u8] = serde_encom::from_slice(encom_data).unwrap();
 
     #[cfg(feature = "std")]
     println!("{bytes:X?}");
