@@ -706,7 +706,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
         while let c @ b'0'..=b'9' = self.peek_or_null()? {
             let digit = (c & 0xF) as u64;
 
-            if overflow!(significand * 10 + digit, u64::max_value()) {
+            if overflow!(significand * 10 + digit, u64::MAX) {
                 let exponent = exponent_before_decimal_point + exponent_after_decimal_point;
                 return self.parse_decimal_overflow(positive, significand, exponent);
             }
@@ -770,7 +770,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
             self.eat_char();
             let digit = (c & 0xF) as i32;
 
-            if overflow!(exp * 10 + digit, i32::max_value()) {
+            if overflow!(exp * 10 + digit, i32::MAX) {
                 let zero_significand = significand == 0;
                 return self.parse_exponent_overflow(positive, zero_significand, positive_exp);
             }
@@ -962,7 +962,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
             self.eat_char();
             let digit = (c & 0xF) as i32;
 
-            if overflow!(exp * 10 + digit, i32::max_value()) {
+            if overflow!(exp * 10 + digit, i32::MAX) {
                 let zero_significand = self.scratch.iter().all(|&digit| digit == b'0');
                 return self.parse_exponent_overflow(positive, zero_significand, positive_exp);
             }
@@ -1478,7 +1478,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
     }
 }
 
-impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for &'a mut Deserializer<R> {
+impl<'de, R: Read<'de>> de::Deserializer<'de> for &mut Deserializer<R> {
     type Error = Error;
 
     #[inline]

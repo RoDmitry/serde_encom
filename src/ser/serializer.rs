@@ -61,7 +61,7 @@ pub(crate) trait SerializerExtras: Sized {
     fn serialize_keystr(self, value: &str) -> Result<()>;
 }
 
-impl<'a, W, F> SerializerExtras for &'a mut Serializer<W, F>
+impl<W, F> SerializerExtras for &mut Serializer<W, F>
 where
     W: io::Write,
     F: Formatter,

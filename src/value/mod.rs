@@ -252,7 +252,7 @@ impl Display for Value {
         fn io_error(_: fmt::Error) -> io::Error {
             // Error value does not matter because Display impl just maps it
             // back to fmt::Error.
-            io::Error::new(io::ErrorKind::Other, "fmt error")
+            io::Error::other("fmt error")
         }
 
         let alternate = f.alternate();
@@ -557,7 +557,7 @@ impl Value {
     /// ```
     /// # use serde_encom::encom_from_json;
     /// #
-    /// let big = i64::max_value() as u64 + 10;
+    /// let big = i64::MAX as u64 + 10;
     /// let v = encom_from_json!({ "a": 64, "b": big, "c": 256.0 });
     ///
     /// assert!(v["a"].is_i64());
@@ -632,7 +632,7 @@ impl Value {
     /// ```
     /// # use serde_encom::encom_from_json;
     /// #
-    /// let big = i64::max_value() as u64 + 10;
+    /// let big = i64::MAX as u64 + 10;
     /// let v = encom_from_json!({ "a": 64, "b": big, "c": 256.0 });
     ///
     /// assert_eq!(v["a"].as_i64(), Some(64));

@@ -296,7 +296,7 @@ impl Eq for Map<String, Value> {}
 /// }
 /// # ;
 /// ```
-impl<'a, Q> ops::Index<&'a Q> for Map<String, Value>
+impl<Q> ops::Index<&Q> for Map<String, Value>
 where
     String: Borrow<Q>,
     Q: ?Sized + Ord + Eq + Hash,
@@ -319,7 +319,7 @@ where
 /// #
 /// map["key"] = encom_from_json!("value");
 /// ```
-impl<'a, Q> ops::IndexMut<&'a Q> for Map<String, Value>
+impl<Q> ops::IndexMut<&Q> for Map<String, Value>
 where
     String: Borrow<Q>,
     Q: ?Sized + Ord + Eq + Hash,

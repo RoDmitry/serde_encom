@@ -615,7 +615,7 @@ impl<'de> Read<'de> for SliceRead<'de> {
 
     #[inline]
     fn parse_int_any_pos(&mut self) -> Result<u64> {
-        let (res, i) = atoi_simd::parse_any_pos(&self.slice.get_safe_unchecked(self.index..))?;
+        let (res, i) = atoi_simd::parse_any_pos(self.slice.get_safe_unchecked(self.index..))?;
         self.index += i;
         Ok(res)
     }
@@ -906,9 +906,9 @@ impl<'de> Read<'de> for StrRead<'de> {
 
 //////////////////////////////////////////////////////////////////////////////
 
-impl<'a, 'de, R> private::Sealed for &'a mut R where R: Read<'de> {}
+impl<'de, R> private::Sealed for &mut R where R: Read<'de> {}
 
-impl<'a, 'de, R> Read<'de> for &'a mut R
+impl<'de, R> Read<'de> for &mut R
 where
     R: Read<'de>,
 {

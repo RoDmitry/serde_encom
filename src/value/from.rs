@@ -91,7 +91,7 @@ impl From<String> for Value {
     }
 }
 
-impl<'a> From<&'a str> for Value {
+impl From<&str> for Value {
     /// Convert string slice to `Value`
     ///
     /// # Examples
