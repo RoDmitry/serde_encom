@@ -7,7 +7,7 @@
 //! `std::io::Error`, which may contain internally a heap-allocated `Box<Error>`
 //! and/or now relying on OS-specific `std::backtrace::Backtrace`.
 
-pub use self::imp::{Error, ErrorKind, Result, Write};
+pub use self::imp::{Error, Result, Write};
 
 #[cfg(not(feature = "std"))]
 #[path = "core.rs"]

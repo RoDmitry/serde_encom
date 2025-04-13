@@ -12,6 +12,10 @@ readme = "README.md"
 license = "MIT OR Apache-2.0"
 edition = "2021"
 
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
 [lib]
 name = "serde_encom"
 path = "src/lib.rs"
@@ -73,4 +77,4 @@ preserve_order = ["indexmap", "std"]
 # to be careful around other recursive operations on the parsed result which may
 # overflow the stack after deserialization has completed, including, but not
 # limited to, Display and Debug and Drop impls.
-# unbounded_depth = []
+unbounded_depth = []

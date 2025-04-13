@@ -1,4 +1,4 @@
-use serde_encom::{encom_from_json, Number, Value};
+use serde_encom::{encom_from_json, Value};
 
 #[test]
 fn test_number() {

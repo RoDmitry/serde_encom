@@ -19,6 +19,7 @@ You can try `encom_from_json!()` macro to convert your own JSON and test it. Res
 - [ ] Fix extra space after `}` in serializer
 - [ ] Fix parse exponent in deserializer
 - [ ] Change errors
+- [ ] Fix features
 
 Maybe:
 Skip Option::None by default, and only if `#[serde(serialize_with = "path")]` is passed, then serialize None
