@@ -66,10 +66,10 @@
 //!     let data = r#"
 //!             name:8=John Doe
 //!             age:43
-//!             phones{
+//!             phones[
 //!                 11=+44 1234567
 //!                 11=+44 2345678
-//!             }
+//!             ]
 //!         "#;
 //!
 //!     // Parse the string of data into serde_encom::Value.

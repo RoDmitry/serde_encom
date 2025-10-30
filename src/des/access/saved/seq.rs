@@ -23,7 +23,7 @@ impl<'de, 'a, R: Read<'de> + 'a> de::SeqAccess<'de> for SavedSeqAccess<'a, R> {
         T: de::DeserializeSeed<'de>,
     {
         match self.des.parse_whitespace()? {
-            Some(b'}') => {
+            Some(b']') => {
                 if self.saved_type == SavedType::None {
                     return Ok(None);
                 }

@@ -4,45 +4,45 @@ pub type ExType = Vec<A1>;
 pub fn get_example() -> ExType {
     vec![A1 {
         a1: 3,
-        a2: "asd".to_owned(),
-        a3: vec!["gds".to_owned(), "tmuj".to_owned()],
+        a2: "a2".to_owned(),
+        a3: vec!["a31".to_owned(), "a32".to_owned()],
         a4: vec![245, 45],
-        a5: A2 {
-            a1: 21,
-            a2: "df".to_owned(),
+        a5: B1 {
+            b1: 21,
+            b2: "a5b2".to_owned(),
         },
         a6: vec![
-            A2 {
-                a1: 65,
-                a2: "ku".to_owned(),
+            B1 {
+                b1: 65,
+                b2: "a6b2".to_owned(),
             },
-            A2 {
-                a1: 87,
-                a2: "h🔥ty".to_owned(),
+            B1 {
+                b1: 87,
+                b2: "h🔥ty".to_owned(),
             },
         ],
         a8: vec![
             E1::U64(7),
             E1::Vecu64(vec![2, 5, 7]),
             E1::U64(9),
-            E1::VecStr(vec!["aasd".to_owned(), "gg".to_owned(), "lk".to_owned()]),
+            E1::VecStr(vec!["a81".to_owned(), "a82".to_owned(), "a83".to_owned()]),
         ],
         a7: E1::U64(3),
         a9: (89, 90),
         a10: (
-            A2 {
-                a1: 65,
-                a2: "ku".to_owned(),
+            B1 {
+                b1: 65,
+                b2: "a10b2".to_owned(),
             },
-            A2 {
-                a1: 87,
-                a2: "hty".to_owned(),
+            B1 {
+                b1: 87,
+                b2: "hty".to_owned(),
             },
         ),
-        a11: (E1::U64(23), "afds".to_owned()),
+        a11: (E1::U64(23), "a11".to_owned()),
         a12: E1::Tuple((32, 543)),
         a13: Some("fash".to_owned()),
-        a14: Some(E1::String("dgasdfgh".to_owned())),
+        a14: Some(E1::String("a14".to_owned())),
         a15: [1, 3, 6, 8],
         a16: [E1::U64(4), E1::U64(6), E1::U64(3), E1::U64(2)],
         a17: vec![(1, 2), (3, 4)],
@@ -61,12 +61,12 @@ pub struct A1 {
     a2: String,
     a3: Vec<String>,
     a4: Vec<u64>,
-    a5: A2,
-    a6: Vec<A2>,
+    a5: B1,
+    a6: Vec<B1>,
     a8: Vec<E1>,
     a7: E1,
     a9: (u64, u64),
-    a10: (A2, A2),
+    a10: (B1, B1),
     a11: (E1, String),
     a12: E1,
     a13: Option<String>,
@@ -83,9 +83,9 @@ pub struct A1 {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub struct A2 {
-    a1: u64,
-    a2: String,
+pub struct B1 {
+    b1: u64,
+    b2: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]

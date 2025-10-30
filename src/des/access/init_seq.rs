@@ -32,13 +32,13 @@ impl<'de, 'a, R: Read<'de> + 'a> de::SeqAccess<'de> for InitSeqAccess<'a, R> {
                     return Err(self.de.peek_error(ErrorCode::ExpectedListCommaOrEnd));
                 }
             } */
-            Some(b'}') => Err(self.des.peek_error(ErrorCode::TrailingComma)), // todo new error
+            Some(b']') => Err(self.des.peek_error(ErrorCode::TrailingComma)), // todo new error
             Some(_) => seed.deserialize(&mut *self.des).map(Some),
             None => Ok(None),
         }
 
         /* match peek {
-            Some(b'}') => Err(self.de.peek_error(ErrorCode::TrailingComma)),
+            Some(b']') => Err(self.de.peek_error(ErrorCode::TrailingComma)),
             Some(_) => Ok(Some(seed.deserialize(&mut *self.de)?)),
             None => Err(self.de.peek_error(ErrorCode::EofWhileParsingValue)),
         } */

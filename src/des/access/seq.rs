@@ -20,7 +20,7 @@ impl<'de, 'a, R: Read<'de> + 'a> de::SeqAccess<'de> for SeqAccess<'a, R> {
         T: de::DeserializeSeed<'de>,
     {
         match self.des.parse_whitespace()? {
-            Some(b'}') => Ok(None),
+            Some(b']') => Ok(None),
             /* Some(b' ') if !self.first => {
                 self.de.eat_char();
                 self.de.parse_whitespace()?
@@ -38,7 +38,7 @@ impl<'de, 'a, R: Read<'de> + 'a> de::SeqAccess<'de> for SeqAccess<'a, R> {
         }
 
         /* match peek {
-            Some(b'}') => Err(self.de.peek_error(ErrorCode::TrailingComma)),
+            Some(b']') => Err(self.de.peek_error(ErrorCode::TrailingComma)),
             Some(_) => Ok(Some(seed.deserialize(&mut *self.de)?)),
             None => Err(self.de.peek_error(ErrorCode::EofWhileParsingValue)),
         } */

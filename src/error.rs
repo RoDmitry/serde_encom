@@ -60,7 +60,7 @@ impl Error {
             | ErrorCode::EofWhileParsingString
             | ErrorCode::EofWhileParsingValue => ErrorCategory::Eof,
             ErrorCode::ExpectedColon
-            // | ErrorCode::ExpectedListCommaOrEnd
+            | ErrorCode::ExpectedListCommaOrEnd
             | ErrorCode::ExpectedObjectCommaOrEnd
             | ErrorCode::ExpectedSomeIdent
             | ErrorCode::ExpectedSomeValue
@@ -259,7 +259,7 @@ pub(crate) enum ErrorCode {
     ExpectedColon,
 
     /// Expected this character to be either a `','` or a `']'`.
-    // ExpectedListCommaOrEnd,
+    ExpectedListCommaOrEnd,
 
     /// Expected this character to be either a `','` or a `'}'`.
     ExpectedObjectCommaOrEnd,
@@ -362,8 +362,8 @@ impl Display for ErrorCode {
             ErrorCode::EofWhileParsingString => f.write_str("EOF while parsing a string"),
             ErrorCode::EofWhileParsingValue => f.write_str("EOF while parsing a value"),
             ErrorCode::ExpectedColon => f.write_str("expected `:`"),
-            // ErrorCode::ExpectedListCommaOrEnd => f.write_str("expected `,` or `]`"),
-            ErrorCode::ExpectedObjectCommaOrEnd => f.write_str("expected `,` or `}`"),
+            ErrorCode::ExpectedListCommaOrEnd => f.write_str("expected ` ` or `]`"),
+            ErrorCode::ExpectedObjectCommaOrEnd => f.write_str("expected ` ` or `}`"),
             ErrorCode::ExpectedSomeIdent => f.write_str("expected ident"),
             ErrorCode::ExpectedSomeValue => f.write_str("expected value"),
             ErrorCode::ExpectedDoubleQuote => f.write_str("expected `\"`"),

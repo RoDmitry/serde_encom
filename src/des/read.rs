@@ -520,7 +520,7 @@ impl<'de> SliceRead<'de> {
                 return error(self, ErrorCode::EofWhileParsingString);
             }
             match self.slice[self.index] {
-                b':' | b'{' => {
+                b':' | b'{' | b'[' => {
                     // if scratch.is_empty() {
                     // Fast path: return a slice of the raw EnCom without any
                     // copying.

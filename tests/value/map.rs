@@ -2,7 +2,7 @@ use serde_encom::{encom_from_json, Value};
 
 #[test]
 fn test_data() {
-    let data = "3{2:6 6{33 22}}";
+    let data = "3{2:6 6[33 22]}";
     let v: Value = serde_encom::from_str(data).unwrap();
     let v2: Value = serde_encom::from_slice(data.as_bytes()).unwrap();
 
@@ -22,10 +22,10 @@ fn test_data2() {
     let data = r#"
          name:8=John Doe
          age:43
-         phones{
+         phones[
              11=+44 1234567
              11=+44 2345678
-         }
+         ]
      "#;
     let v: Value = serde_encom::from_str(data).unwrap();
     let v2: Value = serde_encom::from_slice(data.as_bytes()).unwrap();

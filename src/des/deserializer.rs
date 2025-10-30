@@ -322,7 +322,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
     fn pre_parser_match(&mut self) -> Result<PreParser> {
         loop {
             match self.peek()? {
-                Some(b':' | b'{') => {
+                Some(b':' | b'{' | b'[') => {
                     return Ok(PreParser::SavedMap);
                 }
                 Some(b'=') => return Ok(PreParser::SavedSeq(SavedType::Str)),
@@ -331,7 +331,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                 /* Some(b'e' | b'E') => { // todo????
                     return Ok(PreParser::SavedSeq(SavedState::ExponentNumber))
                 } */
-                Some(b'}' | b' ' | b'\n' | b'\t' | b'\r') | None => {
+                Some(b'}' | b']' | b' ' | b'\n' | b'\t' | b'\r') | None => {
                     return Ok(PreParser::SavedSeq(SavedType::Number));
                 }
                 _ => self.eat_char(),
@@ -343,7 +343,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
     /// no validation of chars, because atoi_simd will do it, if it is numbers
     pub(crate) fn any_after_x7b(&mut self) -> Result<PreParser> {
         if let Some(ch) = self.parse_whitespace()? {
-            if ch == b'{' || ch == b'-' || ch == b't' || ch == b'f' {
+            if ch == b'{' || ch == b'[' || ch == b'-' || ch == b't' || ch == b'f' {
                 return Ok(PreParser::Seq);
             }
             self.read.save_start();
@@ -359,7 +359,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
     #[inline]
     pub(crate) fn end_of_str_or_bytes(&mut self) -> Result<()> {
         match self.peek()? {
-            Some(b'}' | b' ' | b'\n' | b'\t' | b'\r') | None => Ok(()),
+            Some(b'}' | b']' | b' ' | b'\n' | b'\t' | b'\r') | None => Ok(()),
             _ => Err(self.peek_error(ErrorCode::UnexpectedEndOfString)),
         }
     }
@@ -399,7 +399,9 @@ impl<'de, R: Read<'de>> Deserializer<R> {
             /* Some(b'e' | b'E') => {
                 ParserNumber::F64(self.parse_exponent(true, integer, 0)?).visit(visitor)
             } */
-            Some(b'}' | b' ' | b'\n' | b'\t' | b'\r') | None => visitor.visit_u64(parsed_int),
+            Some(b'}' | b']' | b' ' | b'\n' | b'\t' | b'\r') | None => {
+                visitor.visit_u64(parsed_int)
+            }
             Some(_) => Err(self.error(ErrorCode::ExpectedSomeIdent)), // todo: new error?
         };
         self.read.clear_saved();
@@ -449,7 +451,8 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                     Err(err) => return err,
                 }
             } */
-            b'{' => de::Error::invalid_type(Unexpected::Map, exp), // todo: change error type
+            b'[' => de::Error::invalid_type(Unexpected::Seq, exp),
+            b'{' => de::Error::invalid_type(Unexpected::Map, exp),
             _ => self.peek_error(ErrorCode::ExpectedSomeValue),
         };
 
@@ -1232,7 +1235,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                 self.eat_char();
                 Ok(())
             }
-            Some(b'{') => Ok(()), // fixed ":{" here
+            Some(b'{' | b'[') => Ok(()), // fixed ":{" here
             Some(_) => Err(self.peek_error(ErrorCode::ExpectedColon)),
             None => Err(self.peek_error(ErrorCode::EofWhileParsingObject)),
         }
@@ -1240,7 +1243,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
 
     fn end_seq(&mut self) -> Result<()> {
         match self.parse_whitespace()? {
-            Some(b'}') => {
+            Some(b']') => {
                 self.eat_char();
                 Ok(())
             }
@@ -1326,7 +1329,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                     self.read.ignore_str()?;
                     None
                 } */
-                frame @ b'{' => {
+                frame @ b'{' | frame @ b'[' => {
                     /* if let Some(v) = enclosing.take() {
                         self.scratch.push(v);
                     } */
@@ -1353,12 +1356,13 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                         self.eat_char();
                         break;
                     }
+                    Some(b']') if frame == b'[' => {}
                     Some(b'}') if frame == b'{' => {}
                     Some(_) => {
                         if accept_comma {
                             return Err(self.peek_error(match frame {
-                                // b'[' => ErrorCode::ExpectedListCommaOrEnd,
-                                b'{' => ErrorCode::ExpectedObjectCommaOrEnd, // todo: change error
+                                b'[' => ErrorCode::ExpectedListCommaOrEnd,
+                                b'{' => ErrorCode::ExpectedObjectCommaOrEnd,
                                 _ => unreachable!(),
                             }));
                         } else {
@@ -1367,7 +1371,8 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                     }
                     None => {
                         return Err(self.peek_error(match frame {
-                            b'{' => ErrorCode::EofWhileParsingObject, // todo: change error to EofWhileParsing
+                            b'[' => ErrorCode::EofWhileParsingList,
+                            b'{' => ErrorCode::EofWhileParsingObject,
                             _ => unreachable!(),
                         }));
                     }
@@ -1381,7 +1386,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                 accept_comma = true;
             }
 
-            if frame == b'{' {
+            if frame == b'{' || frame == b'[' {
                 match self.parse_whitespace()? {
                     Some(b'"') => self.eat_char(),
                     Some(_) => return Err(self.peek_error(ErrorCode::KeyMustBeAString)),
@@ -1533,7 +1538,7 @@ impl<'de, R: Read<'de>> de::Deserializer<'de> for &mut Deserializer<R> {
                     (Err(err), _) | (_, Err(err)) => Err(err),
                 }
             } */
-            b'{' => {
+            b'{' | b'[' => {
                 check_recursion! {
                     self.eat_char();
                     let value = match self.any_after_x7b()? {
@@ -1845,7 +1850,7 @@ impl<'de, R: Read<'de>> de::Deserializer<'de> for &mut Deserializer<R> {
         };
 
         let value = match peek {
-            b'{' => {
+            b'{' | b'[' => {
                 check_recursion! {
                     self.eat_char();
                     let ret = visitor.visit_seq(SeqAccess::new(self));

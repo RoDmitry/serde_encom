@@ -259,7 +259,7 @@ where
 
     #[inline]
     fn serialize_tuple(self, len: usize) -> Result<Self::SerializeTuple> {
-        self.serialize_seq(Some(len))
+        self.ser.serialize_tuple(len)
     }
 
     #[inline]
@@ -268,7 +268,7 @@ where
         _name: &'static str,
         len: usize,
     ) -> Result<Self::SerializeTupleStruct> {
-        self.serialize_seq(Some(len))
+        self.ser.serialize_tuple_struct(_name, len)
     }
 
     #[inline]

@@ -96,7 +96,7 @@ where
 
     fn peek_end_of_value(&mut self) -> Result<()> {
         match self.de.peek()? {
-            Some(b' ' | b'\n' | b'\t' | b'\r' | b'{' | b'}' | b':') | None => Ok(()),
+            Some(b' ' | b'\n' | b'\t' | b'\r' | b'{' | b'}' | b'[' | b']' | b':') | None => Ok(()),
             Some(_) => {
                 let position = self.de.read.peek_position();
                 Err(Error::syntax(
@@ -134,7 +134,7 @@ where
                 // (like numbers, null, true etc.) we have to look for whitespace or
                 // the beginning of a self-delineated value.
                 let self_delineated_value = match b {
-                    b'{' => true,
+                    b'{' | b'[' => true,
                     _ => false,
                 };
                 self.offset = self.de.read.byte_offset();

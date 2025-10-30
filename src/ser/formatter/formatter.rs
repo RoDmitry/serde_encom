@@ -259,7 +259,7 @@ pub(crate) trait Formatter {
     where
         W: ?Sized + io::Write,
     {
-        writer.write_all(b"{")
+        writer.write_all(b"[")
     }
 
     /// Called after every array.  Writes a `]` to the specified
@@ -269,7 +269,7 @@ pub(crate) trait Formatter {
     where
         W: ?Sized + io::Write,
     {
-        writer.write_all(b"}")
+        writer.write_all(b"]")
     }
 
     /// Called before every array value.  Writes a `,` if needed to

@@ -785,7 +785,7 @@ impl_from_signed!(i128);
 impl Number {
     #[cfg(not(feature = "arbitrary_precision"))]
     #[cold]
-    pub(crate) fn unexpected(&self) -> Unexpected {
+    pub(crate) fn unexpected(&self) -> Unexpected<'_> {
         match self.n {
             N::PosInt(u) => Unexpected::Unsigned(u),
             N::NegInt(i) => Unexpected::Signed(i),
@@ -795,7 +795,7 @@ impl Number {
 
     #[cfg(feature = "arbitrary_precision")]
     #[cold]
-    pub(crate) fn unexpected(&self) -> Unexpected {
+    pub(crate) fn unexpected(&self) -> Unexpected<'_> {
         Unexpected::Other("number")
     }
 }

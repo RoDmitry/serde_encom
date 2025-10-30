@@ -39,7 +39,7 @@ impl<'a> Formatter for PrettyFormatter<'a> {
     {
         self.current_indent += 1;
         self.has_value = false;
-        writer.write_all(b"{\n")?;
+        writer.write_all(b"[\n")?;
         indent(writer, self.current_indent, self.indent)
     }
 
@@ -55,7 +55,7 @@ impl<'a> Formatter for PrettyFormatter<'a> {
             indent(writer, self.current_indent, self.indent)?;
         }
 
-        writer.write_all(b"}")
+        writer.write_all(b"]")
     }
 
     #[inline]

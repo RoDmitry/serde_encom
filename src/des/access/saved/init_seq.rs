@@ -23,7 +23,7 @@ impl<'de, 'a, R: Read<'de> + 'a> de::SeqAccess<'de> for SavedInitSeqAccess<'a, R
         T: de::DeserializeSeed<'de>,
     {
         match self.des.parse_whitespace()? {
-            Some(b'}') => return Err(self.des.peek_error(ErrorCode::TrailingComma)), // todo new error
+            Some(b']') => return Err(self.des.peek_error(ErrorCode::TrailingComma)), // todo new error
             None => {
                 if self.saved_type == SavedType::None {
                     return Ok(None);
