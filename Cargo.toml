@@ -1,6 +1,6 @@
 [package]
 name = "serde_encom"
-version = "0.3.4"
+version = "0.4.0"
 authors = ["Dmitry Rodionov <gh@rdmtr.com>"]
 description = "Official EnCom library"
 documentation = "https://docs.rs/serde_encom/"
