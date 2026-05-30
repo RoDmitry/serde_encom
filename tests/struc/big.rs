@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 pub type ExType = Vec<A1>;
 pub fn get_example() -> ExType {
@@ -52,6 +53,7 @@ pub fn get_example() -> ExType {
         a21: -1,
         a22: 1.5,
         a23: -1.5,
+        a24: HashMap::from([(0, 0), (1, 1), (-1, -1)]),
     }]
 }
 
@@ -80,6 +82,7 @@ pub struct A1 {
     a21: i64,
     a22: f64,
     a23: f64,
+    a24: HashMap<i32, i32>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]

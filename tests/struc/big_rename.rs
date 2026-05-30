@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 pub type ExType = Vec<A1>;
 pub fn get_example() -> ExType {
@@ -52,6 +53,7 @@ pub fn get_example() -> ExType {
         a21: -1,
         a22: 1.5,
         a23: -1.5,
+        a24: HashMap::from([(0, 0), (1, 1), (-1, -1)]),
     }]
 }
 
@@ -103,6 +105,8 @@ pub struct A1 {
     a22: f64,
     #[serde(rename = "f")]
     a23: f64,
+    #[serde(rename = "g")]
+    a24: HashMap<i32, i32>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -145,7 +149,7 @@ fn self_test() {
 #[test]
 fn self_test_no_none() {
     let example = get_example();
-    let example_str = "{1:3 2:2=a2 3[3=a31 3=a32] 4[245 45] 5{1:21 2:4=a5b2} 6[{1:65 2:4=a6b2} {1:87 2:7=h🔥ty}] 8[1:7 2[2 5 7] 1:9 3[3=a81 3=a82 3=a83]] 7{1:3} 9[89 90] q[{1:65 2:5=a10b2} {1:87 2:3=hty}] w[1:23 3=a11] e{4[32 543]} r:4=fash t{5:3=a14} y[1 3 6 8] u[1:4 1:6 1:3 1:2] i[[1 2] [3 4]] o:t p:f s:-1 d:1.5 f:-1.5}";
+    let example_str = "{1:3 2:2=a2 3[3=a31 3=a32] 4[245 45] 5{1:21 2:4=a5b2} 6[{1:65 2:4=a6b2} {1:87 2:7=h🔥ty}] 8[1:7 2[2 5 7] 1:9 3[3=a81 3=a82 3=a83]] 7{1:3} 9[89 90] q[{1:65 2:5=a10b2} {1:87 2:3=hty}] w[1:23 3=a11] e{4[32 543]} r:4=fash t{5:3=a14} y[1 3 6 8] u[1:4 1:6 1:3 1:2] i[[1 2] [3 4]] o:t p:f s:-1 d:1.5 f:-1.5 g{0:0 1:1 -1:-1}}";
     #[cfg(feature = "std")]
     println!("{example_str}");
 

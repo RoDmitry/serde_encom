@@ -25,19 +25,12 @@ macro_rules! deserialize_numeric_key {
         where
             V: de::Visitor<'de>,
         {
-            self.des.eat_char();
-
             match self.des.peek()? {
                 Some(b'0'..=b'9' | b'-') => {}
                 _ => return Err(self.des.error(ErrorCode::ExpectedNumericKey)),
             }
 
             let value = self.des.$delegate(visitor)?;
-
-            match self.des.peek()? {
-                Some(b'"') => self.des.eat_char(),
-                _ => return Err(self.des.peek_error(ErrorCode::ExpectedDoubleQuote)),
-            }
 
             Ok(value)
         }

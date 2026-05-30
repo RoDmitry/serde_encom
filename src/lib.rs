@@ -7,7 +7,10 @@
     clippy::match_like_matches_macro,
     clippy::module_inception,
     clippy::needless_doctest_main,
-    clippy::should_implement_trait
+    clippy::should_implement_trait,
+    unexpected_cfgs,
+    unused_variables,
+    dead_code,
 )]
 
 extern crate alloc;
@@ -20,7 +23,4 @@ mod macros;
 mod ser;
 mod value;
 
-pub use crate::des::*;
-pub use crate::error::*;
-pub use crate::ser::*;
-pub use crate::value::*;
+pub use crate::{des::*, error::*, ser::*, value::*};
