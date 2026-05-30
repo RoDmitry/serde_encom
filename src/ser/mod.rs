@@ -1,10 +1,8 @@
 //! Serialize a Rust data structure into EnCom data.
 
 use self::wrapper::InitSerializer;
-use crate::error::Result;
-use crate::io;
-use alloc::string::String;
-use alloc::vec::Vec;
+use crate::{error::Result, io};
+use alloc::{string::String, vec::Vec};
 use serde::ser::Serialize;
 use serializer::Serializer;
 

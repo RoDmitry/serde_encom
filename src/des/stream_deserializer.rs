@@ -1,9 +1,9 @@
-use super::deserializer::Deserializer;
-use super::read::Fused;
-use super::read::Read;
+use super::{
+    deserializer::Deserializer,
+    read::{Fused, Read},
+};
 use crate::error::{Error, ErrorCode, Result};
-use core::iter::FusedIterator;
-use core::marker::PhantomData;
+use core::{iter::FusedIterator, marker::PhantomData};
 use serde::de;
 
 /// Iterator that deserializes a stream into multiple EnCom values.

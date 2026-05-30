@@ -1,8 +1,12 @@
-use super::formatter::Formatter;
-use super::serializer::Serializer;
-use super::wrapper::{DataSerializer, MapKeySerializer, SeqSerializer};
-use crate::error::{Error, Result};
-use crate::io;
+use super::{
+    formatter::Formatter,
+    serializer::Serializer,
+    wrapper::{DataSerializer, MapKeySerializer, SeqSerializer},
+};
+use crate::{
+    error::{Error, Result},
+    io,
+};
 use serde::ser::{
     Serialize, SerializeMap, SerializeSeq, SerializeStruct, SerializeStructVariant, SerializeTuple,
     SerializeTupleStruct, SerializeTupleVariant,

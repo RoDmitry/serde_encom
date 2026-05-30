@@ -8,13 +8,15 @@
 
 use super::Value;
 use alloc::string::String;
-use core::borrow::Borrow;
-use core::fmt::{self, Debug};
-use core::hash::Hash;
-use core::iter::FusedIterator;
 #[cfg(feature = "preserve_order")]
 use core::mem;
-use core::ops;
+use core::{
+    borrow::Borrow,
+    fmt::{self, Debug},
+    hash::Hash,
+    iter::FusedIterator,
+    ops,
+};
 use serde::de;
 
 #[cfg(not(feature = "preserve_order"))]

@@ -1,8 +1,11 @@
-use super::access::{MapAccess, SavedMapAccess, SavedSeqAccess, SeqAccess, VariantAccess};
 #[cfg(feature = "std")]
 use super::read::IoRead;
-use super::read::{Read, Reference, SliceRead, StrRead};
-use super::{parser_number::ParserNumber, stream_deserializer::StreamDeserializer};
+use super::{
+    access::{MapAccess, SavedMapAccess, SavedSeqAccess, SeqAccess, VariantAccess},
+    parser_number::ParserNumber,
+    read::{Read, Reference, SliceRead, StrRead},
+    stream_deserializer::StreamDeserializer,
+};
 use crate::error::{Error, ErrorCode, Result};
 #[cfg(feature = "float_roundtrip")]
 use crate::lexical;

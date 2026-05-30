@@ -1,8 +1,12 @@
-use crate::error::{Error, Result};
-use crate::io;
-use crate::ser::compound::Compound;
-use crate::ser::formatter::Formatter;
-use crate::ser::serializer::{Serializer, SerializerExtras};
+use crate::{
+    error::{Error, Result},
+    io,
+    ser::{
+        compound::Compound,
+        formatter::Formatter,
+        serializer::{Serializer, SerializerExtras},
+    },
+};
 use alloc::string::ToString;
 use core::fmt::Display;
 use serde::ser::{self, Serialize};

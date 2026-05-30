@@ -1,12 +1,16 @@
 //! When serializing or deserializing EnCom goes wrong.
 
 use crate::io;
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
+use alloc::{
+    boxed::Box,
+    string::{String, ToString},
+};
 use atoi_simd::AtoiSimdError;
-use core::fmt::{self, Debug, Display};
-use core::result;
-use core::str::FromStr;
+use core::{
+    fmt::{self, Debug, Display},
+    result,
+    str::FromStr,
+};
 use serde::{de, ser};
 #[cfg(feature = "std")]
 use std::error;

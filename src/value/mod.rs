@@ -93,21 +93,21 @@ mod map;
 mod number;
 pub(crate) mod seed;
 
-use crate::error::Error;
-use crate::io;
-use alloc::string::String;
-use alloc::vec::Vec;
-use core::fmt::{self, Debug, Display};
-use core::mem;
-use core::str;
-use serde::de::DeserializeOwned;
-use serde::ser::Serialize;
+use crate::{error::Error, io};
+use alloc::{string::String, vec::Vec};
+use core::{
+    fmt::{self, Debug, Display},
+    mem, str,
+};
+use serde::{de::DeserializeOwned, ser::Serialize};
 
 pub(crate) use self::des::ValueVisitor;
-pub use self::index::Index;
-pub use self::map::{Entry, Map};
-pub use self::number::Number;
-pub use self::ser::Serializer;
+pub use self::{
+    index::Index,
+    map::{Entry, Map},
+    number::Number,
+    ser::Serializer,
+};
 
 #[cfg(feature = "raw_value")]
 pub use crate::raw::{to_raw_value, RawValue};

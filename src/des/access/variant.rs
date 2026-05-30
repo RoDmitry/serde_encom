@@ -1,5 +1,7 @@
-use crate::des::{deserializer::Deserializer, read::Read};
-use crate::error::{Error, Result};
+use crate::{
+    des::{deserializer::Deserializer, read::Read},
+    error::{Error, Result},
+};
 use serde::de;
 
 pub(crate) struct VariantAccess<'a, R: 'a> {

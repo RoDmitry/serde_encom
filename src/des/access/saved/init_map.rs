@@ -1,7 +1,8 @@
 use super::super::InitMapAccess;
-use crate::des::wrapper::SavedMapKeyDeserializer;
-use crate::des::{deserializer::Deserializer, read::Read};
-use crate::error::{Error, Result};
+use crate::{
+    des::{deserializer::Deserializer, read::Read, wrapper::SavedMapKeyDeserializer},
+    error::{Error, Result},
+};
 use serde::de;
 
 pub(crate) struct SavedInitMapAccess<'a, R: 'a> {

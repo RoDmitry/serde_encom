@@ -1,11 +1,11 @@
-use super::Map;
-use super::{to_value, Value};
+use super::{to_value, Map, Value};
 use crate::error::{Error, ErrorCode, Result};
-use alloc::borrow::ToOwned;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use core::fmt::Display;
-use core::result;
+use alloc::{
+    borrow::ToOwned,
+    string::{String, ToString},
+    vec::Vec,
+};
+use core::{fmt::Display, result};
 use serde::ser::{Impossible, Serialize};
 
 impl Serialize for Value {

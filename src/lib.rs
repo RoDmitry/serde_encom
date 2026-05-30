@@ -10,7 +10,7 @@
     clippy::should_implement_trait,
     unexpected_cfgs,
     unused_variables,
-    dead_code,
+    dead_code
 )]
 
 extern crate alloc;

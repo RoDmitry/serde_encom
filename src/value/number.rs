@@ -1,7 +1,6 @@
-use crate::des::parser_number::ParserNumber;
-use crate::error::Error;
 #[cfg(feature = "arbitrary_precision")]
 use crate::error::ErrorCode;
+use crate::{des::parser_number::ParserNumber, error::Error};
 #[cfg(feature = "arbitrary_precision")]
 use alloc::borrow::ToOwned;
 #[cfg(feature = "arbitrary_precision")]
@@ -9,10 +8,12 @@ use alloc::string::{String, ToString};
 use core::fmt::{self, Debug, Display};
 #[cfg(not(feature = "arbitrary_precision"))]
 use core::hash::{Hash, Hasher};
-use serde::de::{self, Unexpected, Visitor};
 #[cfg(feature = "arbitrary_precision")]
 use serde::de::{IntoDeserializer, MapAccess};
-use serde::{forward_to_deserialize_any, Deserialize, Deserializer, Serialize, Serializer};
+use serde::{
+    de::{self, Unexpected, Visitor},
+    forward_to_deserialize_any, Deserialize, Deserializer, Serialize, Serializer,
+};
 
 #[cfg(feature = "arbitrary_precision")]
 pub(crate) const TOKEN: &str = "$serde_encom::private::Number";

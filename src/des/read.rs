@@ -3,9 +3,7 @@
 use crate::error::{Error, ErrorCode, Result};
 // use alloc::vec::Vec;
 // use core::char;
-use core::cmp;
-use core::ops::Deref;
-use core::str;
+use ::core::{cmp, ops::Deref, str};
 use debug_unsafe::slice::SliceGetter;
 
 #[cfg(feature = "std")]
@@ -615,7 +613,8 @@ impl<'de> Read<'de> for SliceRead<'de> {
 
     #[inline]
     fn parse_int_any_pos(&mut self) -> Result<u64> {
-        let (res, i) = atoi_simd::parse_any_pos(self.slice.get_safe_unchecked(self.index..))?;
+        let (res, i) =
+            atoi_simd::parse_prefix_pos::<_, false>(self.slice.get_safe_unchecked(self.index..))?;
         self.index += i;
         Ok(res)
     }

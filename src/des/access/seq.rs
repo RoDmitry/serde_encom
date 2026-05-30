@@ -1,5 +1,7 @@
-use crate::des::{deserializer::Deserializer, read::Read};
-use crate::error::{Error, ErrorCode, Result};
+use crate::{
+    des::{deserializer::Deserializer, read::Read},
+    error::{Error, ErrorCode, Result},
+};
 use serde::de;
 
 pub(crate) struct SeqAccess<'a, R: 'a> {

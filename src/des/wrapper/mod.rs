@@ -16,6 +16,7 @@ mod saved_map_key;
 mod saved_seq;
 
 pub use self::init::InitDeserializer;
-pub(crate) use self::map_key::MapKeyDeserializer;
-pub(crate) use self::saved_map_key::SavedMapKeyDeserializer;
-pub(crate) use self::saved_seq::SavedSeqDeserializer;
+pub(crate) use self::{
+    map_key::MapKeyDeserializer, saved_map_key::SavedMapKeyDeserializer,
+    saved_seq::SavedSeqDeserializer,
+};

@@ -1,9 +1,9 @@
-use super::Map;
-use super::Value;
-use alloc::borrow::ToOwned;
-use alloc::string::String;
-use core::fmt::{self, Display};
-use core::ops;
+use super::{Map, Value};
+use alloc::{borrow::ToOwned, string::String};
+use core::{
+    fmt::{self, Display},
+    ops,
+};
 
 /// A type that can be used to index into a `serde_encom::Value`.
 ///

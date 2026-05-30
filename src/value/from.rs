@@ -1,9 +1,9 @@
-use super::Map;
-use super::Number;
-use super::Value;
-use alloc::borrow::Cow;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use super::{Map, Number, Value};
+use alloc::{
+    borrow::Cow,
+    string::{String, ToString},
+    vec::Vec,
+};
 
 macro_rules! from_integer {
     ($($ty:ident)*) => {

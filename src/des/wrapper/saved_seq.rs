@@ -1,8 +1,12 @@
-use crate::des::deserializer::{Deserializer, SavedType};
-use crate::des::read::Read;
-use crate::error::{Error, ErrorCode, Result};
 #[cfg(feature = "float_roundtrip")]
 use crate::lexical;
+use crate::{
+    des::{
+        deserializer::{Deserializer, SavedType},
+        read::Read,
+    },
+    error::{Error, ErrorCode, Result},
+};
 use serde::de;
 
 pub(crate) struct SavedSeqDeserializer<'a, 's, R> {
@@ -22,7 +26,7 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for SavedSeqDeserializer<'a, '
             return Err(self.des.peek_error(ErrorCode::EofWhileParsingList)); // todo: change err?
         } */
 
-        let parsed_int = atoi_simd::parse(self.des.read.get_saved())?;
+        let parsed_int = atoi_simd::parse_pos::<_, false>(self.des.read.get_saved())?;
         let ret = match self.saved_type {
             SavedType::Str => self
                 .des

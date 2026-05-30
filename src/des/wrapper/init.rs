@@ -1,11 +1,15 @@
-use crate::des::access::{
-    InitMapAccess, InitSeqAccess, SavedInitMapAccess, SavedInitSeqAccess, VariantAccess,
-};
-use crate::des::deserializer::{Deserializer, PreParser};
-use crate::des::read::Read;
-use crate::error::{Error, ErrorCode, Result};
 #[cfg(feature = "float_roundtrip")]
 use crate::lexical;
+use crate::{
+    des::{
+        access::{
+            InitMapAccess, InitSeqAccess, SavedInitMapAccess, SavedInitSeqAccess, VariantAccess,
+        },
+        deserializer::{Deserializer, PreParser},
+        read::Read,
+    },
+    error::{Error, ErrorCode, Result},
+};
 use serde::de;
 
 pub struct InitDeserializer<'a, R> {

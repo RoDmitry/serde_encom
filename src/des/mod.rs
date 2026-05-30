@@ -9,24 +9,27 @@ mod stream_deserializer;
 mod wrapper;
 
 // use self::wrapper::InitDeserializer;
-use crate::error::{Error, Result};
 #[cfg(feature = "float_roundtrip")]
 use crate::lexical;
-use crate::value::Number;
+use crate::{
+    error::{Error, Result},
+    value::Number,
+};
 #[cfg(feature = "float_roundtrip")]
 use core::iter;
-use core::result;
-use core::str::FromStr;
+use core::{result, str::FromStr};
 use serde::de;
 
 #[cfg(feature = "arbitrary_precision")]
 use crate::number::NumberDeserializer;
 
-pub use self::deserializer::Deserializer;
 #[cfg(feature = "std")]
 pub use self::read::IoRead;
-pub use self::read::{Read, SliceRead, StrRead};
-pub use self::wrapper::InitDeserializer;
+pub use self::{
+    deserializer::Deserializer,
+    read::{Read, SliceRead, StrRead},
+    wrapper::InitDeserializer,
+};
 
 impl FromStr for Number {
     type Err = Error;

@@ -1,7 +1,11 @@
-use crate::des::deserializer::SavedType;
-use crate::des::wrapper::SavedSeqDeserializer;
-use crate::des::{deserializer::Deserializer, read::Read};
-use crate::error::{Error, ErrorCode, Result};
+use crate::{
+    des::{
+        deserializer::{Deserializer, SavedType},
+        read::Read,
+        wrapper::SavedSeqDeserializer,
+    },
+    error::{Error, ErrorCode, Result},
+};
 use serde::de;
 
 pub(crate) struct SavedSeqAccess<'a, R: 'a> {

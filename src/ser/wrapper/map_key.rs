@@ -1,7 +1,11 @@
-use crate::error::{Error, ErrorCode, Result};
-use crate::io;
-use crate::ser::formatter::Formatter;
-use crate::ser::serializer::{Serializer, SerializerExtras};
+use crate::{
+    error::{Error, ErrorCode, Result},
+    io,
+    ser::{
+        formatter::Formatter,
+        serializer::{Serializer, SerializerExtras},
+    },
+};
 use alloc::string::ToString;
 use core::fmt::Display;
 use serde::ser::{self, Impossible, Serialize};

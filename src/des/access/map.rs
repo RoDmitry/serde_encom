@@ -1,6 +1,7 @@
-use crate::des::wrapper::MapKeyDeserializer;
-use crate::des::{deserializer::Deserializer, read::Read};
-use crate::error::{Error, ErrorCode, Result};
+use crate::{
+    des::{deserializer::Deserializer, read::Read, wrapper::MapKeyDeserializer},
+    error::{Error, ErrorCode, Result},
+};
 use serde::de;
 
 pub(crate) struct MapAccess<'a, R: 'a> {

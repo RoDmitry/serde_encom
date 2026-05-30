@@ -1,12 +1,13 @@
-use super::compound::{Compound, State};
-use super::formatter::CompactFormatter;
-use super::formatter::Formatter;
-use super::formatter::PrettyFormatter;
-use crate::error::{Error, Result};
-use crate::io;
+use super::{
+    compound::{Compound, State},
+    formatter::{CompactFormatter, Formatter, PrettyFormatter},
+};
+use crate::{
+    error::{Error, Result},
+    io,
+};
 use alloc::string::ToString;
-use core::fmt::Display;
-use core::num::FpCategory;
+use core::{fmt::Display, num::FpCategory};
 use serde::ser::{self, Serialize};
 
 /// A structure for serializing Rust values into EnCom.

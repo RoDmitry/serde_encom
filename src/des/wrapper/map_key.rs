@@ -1,8 +1,9 @@
-use crate::des::read::{Read, Reference};
-use crate::error::{Error, ErrorCode, Result};
-use crate::Deserializer;
-use serde::de;
-use serde::forward_to_deserialize_any;
+use crate::{
+    des::read::{Read, Reference},
+    error::{Error, ErrorCode, Result},
+    Deserializer,
+};
+use serde::{de, forward_to_deserialize_any};
 
 /// Only deserialize from this after peeking a '"' byte! Otherwise it may
 /// deserialize invalid EnCom successfully.

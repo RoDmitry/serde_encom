@@ -7,7 +7,7 @@ documentation = "https://docs.rs/serde_encom/"
 repository = "https://github.com/RoDmitry/serde_encom"
 categories = ["encoding", "parser-implementations"]
 keywords = ["encom", "serde", "serialization", "json"]
-include = ["src"]
+include = ["src", "LICENSE-*"]
 readme = "README.md"
 license = "MIT OR Apache-2.0"
 edition = "2021"
@@ -68,7 +68,7 @@ preserve_order = ["indexmap", "std"]
 unbounded_depth = []
 
 [dependencies]
-atoi_simd = "0.16"
+atoi_simd = "0.18"
 debug_unsafe = "0.1"
 indexmap = { version = "2", optional = true }
 itoa = "1"
