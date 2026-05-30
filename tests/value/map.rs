@@ -162,3 +162,9 @@ fn test_number_neg_float() {
     assert_eq!(v, res);
     assert_eq!(v2, res);
 }
+
+#[test]
+fn test_boolean_like() {
+    let data = "fields[33 22] trees:0=";
+    let v: Value = serde_encom::from_str(data).unwrap();
+}

@@ -7,6 +7,7 @@ use crate::{
     },
     error::{Error, ErrorCode, Result},
 };
+use ::std::hint::unreachable_unchecked;
 use serde::de;
 
 pub(crate) struct SavedSeqDeserializer<'a, 's, R> {
@@ -26,19 +27,31 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for SavedSeqDeserializer<'a, '
             return Err(self.des.peek_error(ErrorCode::EofWhileParsingList)); // todo: change err?
         } */
 
-        let parsed_int = atoi_simd::parse_pos::<_, false>(self.des.read.get_saved())?;
-        let ret = match self.saved_type {
-            SavedType::Str => self
-                .des
-                .deserialize_str_by_len(visitor, parsed_int as usize),
-            SavedType::Bytes => self
-                .des
-                .deserialize_bytes_by_len(visitor, parsed_int as usize),
-            SavedType::Number => visitor.visit_u64(parsed_int),
-            SavedType::FloatNumber => {
-                visitor.visit_f64(self.des.parse_decimal(true, parsed_int, 0)?)
+        let saved = self.des.read.get_saved();
+        let ret = if *self.saved_type == SavedType::Boolean {
+            visitor.visit_bool(saved.first() == Some(&b't'))
+        } else if saved.is_empty() {
+            match self.des.read.next()? {
+                Some(b't') => visitor.visit_bool(true),
+                Some(b'f') => visitor.visit_bool(false),
+                _ => Err(self.des.peek_error(ErrorCode::ExpectedSomeIdent)),
             }
-            SavedType::None => Err(self.des.peek_error(ErrorCode::ExpectedSomeIdent)), // todo: new error?
+        } else {
+            let parsed_int = atoi_simd::parse_pos::<_, false>(saved)?;
+            match self.saved_type {
+                SavedType::Str => self
+                    .des
+                    .deserialize_str_by_len(visitor, parsed_int as usize),
+                SavedType::Bytes => self
+                    .des
+                    .deserialize_bytes_by_len(visitor, parsed_int as usize),
+                SavedType::Number => visitor.visit_u64(parsed_int),
+                SavedType::FloatNumber => {
+                    visitor.visit_f64(self.des.parse_decimal(true, parsed_int, 0)?)
+                }
+                SavedType::None => Err(self.des.peek_error(ErrorCode::ExpectedSomeIdent)), // todo: new error?
+                SavedType::Boolean => unsafe { unreachable_unchecked() },
+            }
         };
         self.des.read.clear_saved();
         *self.saved_type = SavedType::None;

@@ -111,6 +111,18 @@ fn test_str2() {
 }
 
 #[test]
+fn test_bools() {
+    let data = "t f t t";
+    let v: Value = serde_encom::from_str(data).unwrap();
+    let v2: Value = serde_encom::from_slice(data.as_bytes()).unwrap();
+
+    println!("{v}");
+    let res = encom_from_json!([true, false, true, true]);
+    assert_eq!(v, res);
+    assert_eq!(v2, res);
+}
+
+#[test]
 fn test_bytes() {
     let data = "1~a";
     let v: Value = serde_encom::from_str(data).unwrap();

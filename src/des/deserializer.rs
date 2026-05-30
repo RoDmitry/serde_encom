@@ -179,13 +179,14 @@ pub(crate) enum PreParser {
     SavedSeq(SavedType),
 }
 
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
 pub(crate) enum SavedType {
     Str,
     Bytes,
     Number,
     FloatNumber,
     // ExponentNumber,
+    Boolean,
     None,
 }
 
@@ -323,6 +324,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
 
     #[inline]
     fn pre_parser_match(&mut self) -> Result<PreParser> {
+        let mut typ = SavedType::Number;
         loop {
             match self.peek()? {
                 Some(b':' | b'{' | b'[') => {
@@ -334,10 +336,16 @@ impl<'de, R: Read<'de>> Deserializer<R> {
                 /* Some(b'e' | b'E') => { // todo????
                     return Ok(PreParser::SavedSeq(SavedState::ExponentNumber))
                 } */
-                Some(b'}' | b']' | b' ' | b'\n' | b'\t' | b'\r') | None => {
-                    return Ok(PreParser::SavedSeq(SavedType::Number));
+                Some(b't' | b'f') => {
+                    typ = SavedType::Boolean;
+                    self.eat_char();
                 }
-                _ => self.eat_char(),
+                Some(b'}' | b']' | b' ' | b'\n' | b'\t' | b'\r') | None => {
+                    return Ok(PreParser::SavedSeq(typ));
+                }
+                Some(_) => {
+                    self.eat_char();
+                }
             }
         }
     }
@@ -346,7 +354,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
     /// no validation of chars, because atoi_simd will do it, if it is numbers
     pub(crate) fn any_after_x7b(&mut self) -> Result<PreParser> {
         if let Some(ch) = self.parse_whitespace()? {
-            if ch == b'{' || ch == b'[' || ch == b'-' || ch == b't' || ch == b'f' {
+            if ch == b'{' || ch == b'[' || ch == b'-' {
                 return Ok(PreParser::Seq);
             }
             self.read.save_start();
@@ -1530,7 +1538,7 @@ impl<'de, R: Read<'de>> de::Deserializer<'de> for &mut Deserializer<R> {
                     Reference::Copied(s) => visitor.visit_str(s),
                 }
             } */
-            /* b'[' => {
+            b'[' => {
                 check_recursion! {
                     self.eat_char();
                     let ret = visitor.visit_seq(SeqAccess::new(self));
@@ -1540,8 +1548,8 @@ impl<'de, R: Read<'de>> de::Deserializer<'de> for &mut Deserializer<R> {
                     (Ok(ret), Ok(())) => Ok(ret),
                     (Err(err), _) | (_, Err(err)) => Err(err),
                 }
-            } */
-            b'{' | b'[' => {
+            }
+            b'{' => {
                 check_recursion! {
                     self.eat_char();
                     let value = match self.any_after_x7b()? {
