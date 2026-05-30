@@ -68,8 +68,14 @@ impl<'de> Visitor<'de> for ValueVisitor {
 
     #[cfg(any(feature = "std", feature = "alloc"))]
     #[inline]
-    fn visit_borrowed_bytes<E>(self, v: &'de [u8]) -> Result<Value, E> {
+    fn visit_bytes<E>(self, v: &[u8]) -> Result<Value, E> {
         Ok(Value::Bytes(v.to_owned()))
+    }
+
+    #[cfg(any(feature = "std", feature = "alloc"))]
+    #[inline]
+    fn visit_byte_buf<E>(self, v: Vec<u8>) -> Result<Value, E> {
+        Ok(Value::Bytes(v))
     }
 
     #[inline]
@@ -405,6 +411,7 @@ impl<'de> serde::Deserializer<'de> for Value {
             #[cfg(any(feature = "std", feature = "alloc"))]
             Value::String(v) => visitor.visit_string(v),
             Value::Array(v) => visit_array(v, visitor),
+            Value::Bytes(v) => visitor.visit_byte_buf(v),
             _ => Err(self.invalid_type(&visitor)),
         }
     }
@@ -903,6 +910,7 @@ impl<'de> serde::Deserializer<'de> for &'de Value {
         match self {
             Value::String(v) => visitor.visit_borrowed_str(v),
             Value::Array(v) => visit_array_ref(v, visitor),
+            Value::Bytes(v) => visitor.visit_borrowed_bytes(v),
             _ => Err(self.invalid_type(&visitor)),
         }
     }
