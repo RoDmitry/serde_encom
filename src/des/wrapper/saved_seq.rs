@@ -30,6 +30,10 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for SavedSeqDeserializer<'a, '
         let saved = self.des.read.get_saved();
         let ret = if *self.saved_type == SavedType::Boolean {
             visitor.visit_bool(saved.first() == Some(&b't'))
+        } else if *self.saved_type == SavedType::Number && saved.first() == Some(&b'-') {
+            visitor.visit_i64(atoi_simd::parse_neg::<_, false>(unsafe {
+                saved.get_unchecked(1..)
+            })?)
         } else if saved.is_empty() {
             match self.des.read.next()? {
                 Some(b't') => visitor.visit_bool(true),
@@ -37,6 +41,12 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for SavedSeqDeserializer<'a, '
                 _ => Err(self.des.peek_error(ErrorCode::ExpectedSomeIdent)),
             }
         } else {
+            let negative = saved.first() == Some(&b'-');
+            let saved = if negative {
+                unsafe { saved.get_unchecked(1..) }
+            } else {
+                saved
+            };
             let parsed_int = atoi_simd::parse_pos::<_, false>(saved)?;
             match self.saved_type {
                 SavedType::Str => self
@@ -47,7 +57,7 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for SavedSeqDeserializer<'a, '
                     .deserialize_bytes_by_len(visitor, parsed_int as usize),
                 SavedType::Number => visitor.visit_u64(parsed_int),
                 SavedType::FloatNumber => {
-                    visitor.visit_f64(self.des.parse_decimal(true, parsed_int, 0)?)
+                    visitor.visit_f64(self.des.parse_decimal(!negative, parsed_int, 0)?)
                 }
                 SavedType::None => Err(self.des.peek_error(ErrorCode::ExpectedSomeIdent)), // todo: new error?
                 SavedType::Boolean => unsafe { unreachable_unchecked() },

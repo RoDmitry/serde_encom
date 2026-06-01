@@ -354,7 +354,7 @@ impl<'de, R: Read<'de>> Deserializer<R> {
     /// no validation of chars, because atoi_simd will do it, if it is numbers
     pub(crate) fn any_after_x7b(&mut self) -> Result<PreParser> {
         if let Some(ch) = self.parse_whitespace()? {
-            if ch == b'{' || ch == b'[' || ch == b'-' {
+            if ch == b'{' || ch == b'[' {
                 return Ok(PreParser::Seq);
             }
             self.read.save_start();

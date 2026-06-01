@@ -104,6 +104,18 @@ fn test_map() {
 }
 
 #[test]
+fn test_map_neg() {
+    let data = "-1:11";
+    let v: Value = serde_encom::from_str(data).unwrap();
+    let v2: Value = serde_encom::from_slice(data.as_bytes()).unwrap();
+
+    println!("{v}");
+    let res = encom_from_json!({"-1": 11});
+    assert_eq!(v, res);
+    assert_eq!(v2, res);
+}
+
+#[test]
 fn test_null() {
     let data = "a:n";
     let v: Value = serde_encom::from_str(data).unwrap();
