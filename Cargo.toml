@@ -1,6 +1,6 @@
 [package]
 name = "serde_encom"
-version = "0.4.0"
+version = "0.4.1"
 authors = ["Dmitry Rodionov <gh@rdmtr.com>"]
 description = "Official EnCom library"
 documentation = "https://docs.rs/serde_encom/"
@@ -76,5 +76,5 @@ ryu = "1"
 serde = { version = "1", default-features = false }
 
 [dev-dependencies]
-serde = { version = "1.0", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
 serde_bytes = "0.11"
