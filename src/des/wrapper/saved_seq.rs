@@ -58,7 +58,9 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for SavedSeqDeserializer<'a, '
                 SavedType::FloatNumber => {
                     visitor.visit_f64(self.des.parse_decimal(!negative, parsed_int, 0)?)
                 }
-                SavedType::None | SavedType::Boolean => Err(self.des.peek_error(ErrorCode::ExpectedSomeValue)), // todo: new error?
+                SavedType::None | SavedType::Boolean => {
+                    Err(self.des.peek_error(ErrorCode::ExpectedSomeValue)) // todo: new error?
+                }
             }
         };
         self.des.read.clear_saved();
