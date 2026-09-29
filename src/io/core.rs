@@ -11,7 +11,7 @@ pub enum ErrorKind {
     Other,
 }
 
-// IO errors can never occur in no-std mode. All our no-std IO implementations
+// I/O errors can never occur in no-std mode. All our no-std I/O implementations
 // are infallible.
 pub struct Error;
 
@@ -23,6 +23,10 @@ impl Display for Error {
 
 impl Error {
     pub(crate) fn new(_kind: ErrorKind, _error: &'static str) -> Error {
+        Error
+    }
+
+    pub(crate) fn other(_error: &'static str) -> Error {
         Error
     }
 }

@@ -7,7 +7,6 @@ use crate::{
     },
     error::{Error, ErrorCode, Result},
 };
-use ::std::hint::unreachable_unchecked;
 use serde::de;
 
 pub(crate) struct SavedSeqDeserializer<'a, 's, R> {
@@ -59,8 +58,7 @@ impl<'de, 'a, R: Read<'de>> de::Deserializer<'de> for SavedSeqDeserializer<'a, '
                 SavedType::FloatNumber => {
                     visitor.visit_f64(self.des.parse_decimal(!negative, parsed_int, 0)?)
                 }
-                SavedType::None => Err(self.des.peek_error(ErrorCode::ExpectedSomeIdent)), // todo: new error?
-                SavedType::Boolean => unsafe { unreachable_unchecked() },
+                SavedType::None | SavedType::Boolean => Err(self.des.peek_error(ErrorCode::ExpectedSomeValue)), // todo: new error?
             }
         };
         self.des.read.clear_saved();
